@@ -125,6 +125,12 @@ public sealed partial class MetadataIngestStep(Ffmpeg ffmpeg, ILogger<MetadataIn
 /// <summary>Thin wrapper over the ffmpeg/ffprobe CLIs. Missing binaries degrade to "no metadata / no thumbnail".</summary>
 public sealed class Ffmpeg(ILogger<Ffmpeg> log)
 {
+    Task<bool>? _available;
+
+    /// <summary>Whether ffprobe runs at all (checked once). Without it, videos get no metadata or poster frames.</summary>
+    public Task<bool> IsAvailableAsync() =>
+        _available ??= RunAsync("ffprobe", ["-version"], CancellationToken.None).ContinueWith(t => t.Result.Code == 0);
+
     public async Task<string?> ProbeAsync(string path, CancellationToken ct)
     {
         var (code, stdout) = await RunAsync("ffprobe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", path], ct);

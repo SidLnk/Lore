@@ -14,6 +14,10 @@
   td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid #8884; }
   button { font: inherit; padding: 8px 14px; }
   .muted { opacity: .7; }
+  .status { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+  .status dt { opacity: .7; }
+  .status dd { margin: 0; }
+  .warn { color: light-dark(#b3261e, #ffb4ab); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -25,6 +29,11 @@
   <button id="new-code">New pairing code</button>
   <p class="code" id="code" aria-live="polite"></p>
   <p class="muted" id="expires"></p>
+</section>
+
+<section>
+  <h2>Server</h2>
+  <dl id="status" class="status"></dl>
 </section>
 
 <section>
@@ -66,6 +75,30 @@ async function loadDevices() {
   }));
 }
 loadDevices();
+
+const bytes = n => {
+  for (const [u, k] of [['TB', 2 ** 40], ['GB', 2 ** 30], ['MB', 2 ** 20], ['KB', 2 ** 10]])
+    if (n >= k) return (n / k).toFixed(1) + ' ' + u;
+  return n + ' B';
+};
+
+async function loadStatus() {
+  const s = await (await fetch('api/status')).json();
+  const rows = [
+    ['Photos & videos', `${s.mediaCount.toLocaleString()} (${bytes(s.mediaBytes)})`],
+    ['Recycle bin', `${s.binCount.toLocaleString()} item(s)`],
+    ['Uploads in progress', `${s.uploadsInProgress} (${bytes(s.partialBytes)} received)`],
+    ['Disk', `${bytes(s.volumeFreeBytes)} free of ${bytes(s.volumeTotalBytes)}`, s.volumeFreeBytes < s.volumeTotalBytes * 0.05],
+    ['Last DB snapshot', s.lastSnapshotAt ? fmt(s.lastSnapshotAt) : 'Not yet', !s.lastSnapshotAt],
+    ['Video tools (ffmpeg)', s.ffmpegAvailable ? 'Available' : 'Missing: videos get no thumbnails or dates', !s.ffmpegAvailable],
+  ];
+  document.getElementById('status').replaceChildren(...rows.flatMap(([k, v, warn]) => {
+    const dt = document.createElement('dt'); dt.textContent = k;
+    const dd = document.createElement('dd'); dd.textContent = v; if (warn) dd.className = 'warn';
+    return [dt, dd];
+  }));
+}
+loadStatus();
 </script>
 </body>
 </html>

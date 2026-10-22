@@ -21,7 +21,7 @@
 			<Button Grid.Column="1" Text="Retry failed" Command="{Binding RetryFailedCommand}" IsVisible="{Binding HasFailed}" />
 			<Button Grid.Column="2" Text="Clear done" Command="{Binding ClearDoneCommand}" />
 		</Grid>
-		<CollectionView Grid.Row="3" ItemsSource="{Binding Rows}">
+		<CollectionView x:Name="Queue" Grid.Row="3" ItemsSource="{Binding Rows}">
 			<CollectionView.ItemTemplate>
 				<DataTemplate x:DataType="pages:QueueRow">
 					<VerticalStackLayout Padding="0,6" Spacing="2">

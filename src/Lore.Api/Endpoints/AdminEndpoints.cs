@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using Dapper;
 using Lore.Api.Data;
+using Lore.Api.Media;
+using Lore.Api.Storage;
 using Lore.Contracts;
 
 namespace Lore.Api.Endpoints;
@@ -20,6 +22,28 @@ public static class AdminEndpoints
             await c.ExecuteAsync("DELETE FROM PairingCode WHERE ExpiresAt < @now", new { now = DateTimeOffset.UtcNow });
             await c.ExecuteAsync("INSERT OR REPLACE INTO PairingCode(Code, ExpiresAt) VALUES (@code, @expiresAt)", new { code, expiresAt });
             return new PairingCodeDto(code, expiresAt);
+        });
+
+        admin.MapGet("/api/status", async (Db db, StorageRegistry storage, MaintenanceService maintenance, Ffmpeg ffmpeg, LorePaths paths) =>
+        {
+            using var c = db.Open();
+            var media = await c.QuerySingleAsync<(long Count, long Bytes)>(
+                "SELECT COUNT(*), COALESCE(SUM(FileSize), 0) FROM MediaAsset WHERE DeletedAt IS NULL");
+            var bin = await c.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM MediaAsset WHERE DeletedAt IS NOT NULL");
+            var uploads = await c.ExecuteScalarAsync<long>("SELECT COUNT(*) FROM Upload");
+            var (total, free) = storage.Primary.GetUsage();
+            return new
+            {
+                mediaCount = media.Count,
+                mediaBytes = media.Bytes,
+                binCount = bin,
+                uploadsInProgress = uploads,
+                partialBytes = Directory.EnumerateFiles(paths.Uploads, "*.part").Sum(f => new FileInfo(f).Length),
+                volumeTotalBytes = total,
+                volumeFreeBytes = free,
+                lastSnapshotAt = maintenance.LastSnapshotAt,
+                ffmpegAvailable = await ffmpeg.IsAvailableAsync(),
+            };
         });
 
         admin.MapGet("/api/devices", async (Db db) =>

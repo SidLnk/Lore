@@ -16,8 +16,22 @@ public sealed class Uploads(Session session)
 
 	public static async Task WaitForLanAsync(CancellationToken ct)
 	{
-		// shortcut: polls every 5 s; switch to ConnectivityChanged if battery use shows up.
-		while (!OnLan) await Task.Delay(TimeSpan.FromSeconds(5), ct);
+		if (OnLan) return;
+		var lan = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		void Changed(object? sender, ConnectivityChangedEventArgs e)
+		{
+			if (OnLan) lan.TrySetResult();
+		}
+		Connectivity.Current.ConnectivityChanged += Changed;
+		try
+		{
+			if (OnLan) return; // connected between the first check and subscribing
+			await lan.Task.WaitAsync(ct);
+		}
+		finally
+		{
+			Connectivity.Current.ConnectivityChanged -= Changed;
+		}
 	}
 
 #if ANDROID

@@ -26,7 +26,8 @@ builder.Services.AddSingleton<Ffmpeg>();
 builder.Services.AddSingleton(sp => new Thumbnails(paths.Derived, sp.GetRequiredService<StorageRegistry>(),
     sp.GetRequiredService<Ffmpeg>(), sp.GetRequiredService<ILogger<Thumbnails>>()));
 builder.Services.AddSingleton<IIngestStep, MetadataIngestStep>();
-builder.Services.AddHostedService<SnapshotService>();
+builder.Services.AddSingleton<MaintenanceService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<MaintenanceService>());
 
 builder.Services.AddAuthentication(DeviceAuthHandler.SchemeName)
     .AddScheme<AuthenticationSchemeOptions, DeviceAuthHandler>(DeviceAuthHandler.SchemeName, null)

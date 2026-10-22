@@ -52,6 +52,9 @@ public sealed partial class UploadViewModel : ObservableObject
 	[ObservableProperty] public partial string Summary { get; set; } = "";
 	[ObservableProperty] public partial bool HasFailed { get; set; }
 
+	/// <summary>Raised when new queue rows appear at the top, so the page can scroll to them.</summary>
+	public event Action? RowsAddedAtTop;
+
 	[RelayCommand] Task ChooseFromPhoneAsync() => Shell.Current.GoToAsync("gallery");
 
 	/// <summary>Fallback when Lore isn't allowed to read the gallery. Android strips location from these copies.</summary>
@@ -97,6 +100,7 @@ public sealed partial class UploadViewModel : ObservableObject
 			Rows.Remove(_rows[gone]);
 			_rows.Remove(gone);
 		}
+		var addedAtTop = false;
 		for (var n = 0; n < items.Count; n++)
 		{
 			var item = items[n];
@@ -104,9 +108,11 @@ public sealed partial class UploadViewModel : ObservableObject
 			{
 				_rows[item.Id] = row = new QueueRow(item.Id);
 				Rows.Insert(Math.Min(n, Rows.Count), row);
+				addedAtTop |= n == 0;
 			}
 			row.Update(item);
 		}
+		if (addedAtTop) RowsAddedAtTop?.Invoke();
 
 		int Count(UploadStatus s) => items.Count(i => i.Status == s);
 		var left = Count(UploadStatus.Pending) + Count(UploadStatus.Uploading);
