@@ -49,6 +49,15 @@
 </section>
 
 <section>
+  <h2>App update</h2>
+  <p class="muted">Phones on home Wi-Fi offer this version under Family → Update Lore. Upload the signed APK from a Lore release.</p>
+  <p id="app-current"></p>
+  <input type="file" id="app-file" accept=".apk,application/vnd.android.package-archive">
+  <button id="app-upload">Upload APK</button>
+  <p class="muted" id="app-status" aria-live="polite"></p>
+</section>
+
+<section>
   <h2>Devices</h2>
   <table>
     <thead><tr><th>Name</th><th>Paired</th><th>Last seen</th><th></th></tr></thead>
@@ -113,6 +122,23 @@ async function loadStatus() {
   }));
 }
 loadStatus();
+
+async function loadApp() {
+  const r = await fetch('/admin/api/app');
+  document.getElementById('app-current').textContent = r.ok
+    ? (v => `Offering version ${v.versionName} (${bytes(v.size)}), uploaded ${fmt(v.uploadedAt)}.`)(await r.json())
+    : 'No app version uploaded yet.';
+}
+document.getElementById('app-upload').onclick = async () => {
+  const file = document.getElementById('app-file').files[0];
+  const status = document.getElementById('app-status');
+  if (!file) { status.textContent = 'Choose the APK file first.'; return; }
+  status.textContent = `Uploading ${file.name}…`;
+  const r = await fetch('/admin/api/app', { method: 'POST', body: file });
+  status.textContent = r.ok ? 'Done. Phones will see the update next time they open Lore on home Wi-Fi.' : (await r.text()).replace(/^"|"$/g, '');
+  if (r.ok) loadApp();
+};
+loadApp();
 </script>
 </body>
 </html>

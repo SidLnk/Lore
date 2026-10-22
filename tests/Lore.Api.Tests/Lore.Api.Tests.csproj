@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <None Include="Fixtures\*.heic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\*.heic;Fixtures\*.bin" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

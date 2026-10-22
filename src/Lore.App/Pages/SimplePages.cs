@@ -15,17 +15,22 @@ public sealed class HomePage : ContentPage
 	readonly Label _storage = new();
 	readonly Label _queue = new() { IsVisible = false, FontFamily = "OpenSansSemibold" };
 	readonly Button _bin = new() { Text = "Recycle bin", HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(-12, 0, 0, 0) };
+	readonly Button _updateHint = new() { IsVisible = false, HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(-12, 0, 0, 0) };
+	readonly AppUpdater _updater;
 	readonly CollectionView _recent;
 	List<MediaItem> _items = [], _shown = [];
 	int _span = 3;
 
-	public HomePage(Session session, Uploads uploads, ViewerState viewer)
+	public HomePage(Session session, Uploads uploads, ViewerState viewer, AppUpdater updater)
 	{
+		_updater = updater;
 		_session = session;
 		_uploads = uploads;
 		_viewer = viewer;
 		Title = "Home";
 		_bin.Style = (Style)Application.Current!.Resources["TextButton"];
+		_updateHint.Style = (Style)Application.Current!.Resources["TextButton"];
+		_updateHint.Clicked += async (_, _) => await Shell.Current.GoToAsync("//family");
 
 		_recent = new CollectionView
 		{
@@ -74,7 +79,7 @@ public sealed class HomePage : ContentPage
 			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
 			Children =
 			{
-				new VerticalStackLayout { Padding = new Thickness(16, 8, 16, 0), Spacing = 4, Children = { _queue, _storage, _bin } },
+				new VerticalStackLayout { Padding = new Thickness(16, 8, 16, 0), Spacing = 4, Children = { _queue, _storage, _bin, _updateHint } },
 				new Grid
 				{
 					Padding = new Thickness(16, 16, 4, 4),
@@ -113,6 +118,8 @@ public sealed class HomePage : ContentPage
 			_bin.Text = stats.BinCount == 0 ? "Recycle bin" : $"Recycle bin · {Format.Plural(stats.BinCount, "item")}";
 			// Enough for four full rows at the widest grid (9 columns); each width shows four rows.
 			_items = (await api.GetMediaAsync(new MediaQuery(), limit: 36)).Items.Select(m => new MediaItem(m, api)).ToList();
+			if (await _updater.CheckAsync() is { } update) _updateHint.Text = $"Update available: Lore {update.VersionName}";
+			_updateHint.IsVisible = _updater.Available != null;
 			ShowRecent();
 		}
 		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
@@ -126,17 +133,24 @@ public sealed class HomePage : ContentPage
 public sealed class FamilyPage : ContentPage
 {
 	readonly Session _session;
+	readonly AppUpdater _updater;
 	readonly VerticalStackLayout _members = new() { Spacing = 16 };
+	readonly Label _version = new();
+	readonly Button _update = new() { IsVisible = false, HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(0, 4, 0, 0) };
 
-	public FamilyPage(Session session)
+	public FamilyPage(Session session, AppUpdater updater)
 	{
 		_session = session;
+		_updater = updater;
 		Title = "Family";
 		Adaptive.CapWidth(this);
 		var styles = Application.Current!.Resources;
 		var owners = session.Family.Select(f => new OwnerOption(f.Id, f.Name)).ToList();
 		var picker = new Picker { Title = "This phone belongs to", ItemsSource = owners, SelectedItem = owners.FirstOrDefault(o => o.Id == session.DefaultOwnerId) };
 		var status = new Label { Style = (Style)styles["Quiet"], IsVisible = false };
+		_version.Style = (Style)styles["Quiet"];
+		_update.Style = (Style)styles["SecondaryButton"];
+		_update.Clicked += async (_, _) => await UpdateAsync();
 		picker.SelectedIndexChanged += async (_, _) =>
 		{
 			if (picker.SelectedItem is not OwnerOption { Id: { } id } || id == session.DefaultOwnerId) return;
@@ -180,6 +194,8 @@ public sealed class FamilyPage : ContentPage
 							picker,
 							status,
 							new Label { Text = "Server " + session.Api?.BaseAddress, Style = (Style)styles["Quiet"] },
+							_version,
+							_update,
 						},
 					},
 					unpair,
@@ -188,9 +204,42 @@ public sealed class FamilyPage : ContentPage
 		};
 	}
 
+	async Task UpdateAsync()
+	{
+#if ANDROID
+		if (_updater.Available is not { } v) return;
+		_update.IsEnabled = false;
+		try
+		{
+			var started = await _updater.InstallAsync(v, p => MainThread.BeginInvokeOnMainThread(() => _update.Text = $"Downloading… {p:P0}"), CancellationToken.None);
+			_version.Text = started
+				? $"Lore {AppUpdater.CurrentVersion}. Confirm the update in Android's prompt."
+				: "Allow Lore to install apps in the settings that just opened, then come back and tap Update again.";
+		}
+		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException or IOException)
+		{
+			_version.Text = "The update didn't download. Are you on home Wi-Fi? Try again.";
+		}
+		finally
+		{
+			_update.Text = $"Update Lore to {v.VersionName}";
+			_update.IsEnabled = true;
+		}
+#else
+		await Task.CompletedTask;
+#endif
+	}
+
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
+		_version.Text = $"Lore {AppUpdater.CurrentVersion}";
+		if (await _updater.CheckAsync() is { } update)
+		{
+			_version.Text = $"Lore {AppUpdater.CurrentVersion}. Version {update.VersionName} is ready on the home PC ({Format.Bytes(update.Size)}).";
+			_update.Text = $"Update Lore to {update.VersionName}";
+		}
+		_update.IsVisible = _updater.Available != null;
 		StorageStatsDto? stats = null;
 		try { stats = await _session.Api!.GetStorageAsync(); }
 		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException) { }

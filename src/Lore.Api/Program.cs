@@ -58,7 +58,9 @@ UploadEndpoints.Map(api);
 MediaEndpoints.Map(api);
 OrganizeEndpoints.Map(api);
 
-AdminEndpoints.Map(app.MapGroup("/admin").RequireAuthorization("admin"), app.Environment);
+var admin = app.MapGroup("/admin").RequireAuthorization("admin");
+AdminEndpoints.Map(admin, app.Environment);
+AppEndpoints.Map(api, admin, paths);
 
 app.Run();
 

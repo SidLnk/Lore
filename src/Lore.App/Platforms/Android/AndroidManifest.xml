@@ -19,4 +19,6 @@
 	<uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 	<!-- Save to phone on Android 8-9 and Free up space on 8-10; Android 11+ uses system trash/insert requests instead. -->
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+	<!-- In-app updates from the home server: hands the verified APK to Android's installer, which always asks. -->
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 </manifest>

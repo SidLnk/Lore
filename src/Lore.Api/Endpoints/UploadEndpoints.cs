@@ -170,6 +170,8 @@ public sealed class LorePaths(string dataRoot)
     public string Uploads { get; } = Directory.CreateDirectory(Path.Combine(dataRoot, "uploads")).FullName;
     public string Derived { get; } = Directory.CreateDirectory(Path.Combine(dataRoot, "derived")).FullName;
     public string Snapshots { get; } = Directory.CreateDirectory(Path.Combine(dataRoot, "db-snapshots")).FullName;
+    /// <summary>The Android APK offered to phones as an in-app update.</summary>
+    public string App { get; } = Directory.CreateDirectory(Path.Combine(dataRoot, "app")).FullName;
 
     public string Part(Guid uploadId) => Path.Combine(Uploads, uploadId.ToString("N") + ".part");
     public long PartLength(Guid uploadId) => File.Exists(Part(uploadId)) ? new FileInfo(Part(uploadId)).Length : 0;

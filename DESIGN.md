@@ -272,6 +272,14 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
   - **Older Android:** Lore asks first, and the copies are deleted for good.
   - **Result toast:** "Moved 18 items (926 KB) to the phone's trash. Android empties it after 30 days; Lore keeps the originals."
 
+### App Updates
+- **Family → This phone:** a quiet "Lore 1.3" line.
+  - When the home PC offers a newer version, it reads "Lore 1.2. Version 1.3 is ready on the home PC (35.4 MB)." with an outlined **Update Lore to 1.3** button.
+  - The button reads "Downloading… 31%" while it works, then hands over to Android's own "Do you want to update this app?" prompt.
+  - The first time, Android's "Install unknown apps" page opens instead, and the line says to allow it and tap Update again.
+- **Home:** a text button "Update available: Lore 1.3" that leads to Family.
+- **Admin page:** an "App update" section showing the offered version, with a file picker and an **Upload APK** button. Older versions and non-Lore APKs are refused with a plain message.
+
 ### Queue Row
 - **Line 1:** the filename (middle-truncated), with a short status on the right in Quiet style ("Uploaded", "Already in Lore", "62% · 3.4 MB", "Retry 2/5").
 - **Line 2:** a full-width Archive Green progress bar.

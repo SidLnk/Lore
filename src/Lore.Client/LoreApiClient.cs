@@ -144,6 +144,23 @@ public sealed class LoreApiClient(HttpClient http)
         using (res) throw await ErrorAsync(res, ct);
     }
 
+    /// <summary>The app version the home server offers, or null when it has none.</summary>
+    public async Task<AppVersionDto?> GetAppVersionAsync(CancellationToken ct = default)
+    {
+        using var res = await http.GetAsync("api/app", ct);
+        if (res.StatusCode == HttpStatusCode.NotFound) return null;
+        if (!res.IsSuccessStatusCode) throw await ErrorAsync(res, ct);
+        return await res.Content.ReadFromJsonAsync<AppVersionDto>(ct);
+    }
+
+    /// <summary>The offered APK as a stream (not buffered). Dispose it to free the connection.</summary>
+    public async Task<Stream> OpenAppApkAsync(CancellationToken ct = default)
+    {
+        var res = await http.GetAsync("api/app/apk", HttpCompletionOption.ResponseHeadersRead, ct);
+        if (res.IsSuccessStatusCode) return await res.Content.ReadAsStreamAsync(ct);
+        using (res) throw await ErrorAsync(res, ct);
+    }
+
     // Image and video controls can't send headers, so media URLs carry the token.
     public Uri ThumbUrl(Guid id) => MediaUrl(id, "thumb");
     public Uri PreviewUrl(Guid id) => MediaUrl(id, "preview");

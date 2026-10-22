@@ -49,6 +49,9 @@ public record MediaPage(IReadOnlyList<MediaDto> Items, string? NextCursor);
 
 public record SetFavoriteRequest(bool Favorite);
 
+/// <summary>The Android app the home server offers for in-app updates.</summary>
+public record AppVersionDto(int VersionCode, string VersionName, string Sha256, long Size, DateTimeOffset UploadedAt);
+
 /// <summary>Which of these SHA-256s Lore holds outside the recycle bin (lets a phone free space safely).</summary>
 public record ExistsRequest(IReadOnlyList<string> Sha256s);
 public record ExistsResponse(IReadOnlyList<string> Present);

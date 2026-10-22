@@ -63,6 +63,16 @@ dotnet publish src/Lore.App -f net10.0-android -c Release
 
 The APK is `src/Lore.App/bin/Release/net10.0-android/publish/arpa.home.lore-Signed.apk`. Copy it to the phone (USB file transfer, Drive, chat), open it and allow **Install unknown apps** for the app you opened it from.
 
+## Update the app on the phones
+
+After the first install, phones update themselves from the home PC:
+1. Open `http://lore.home.arpa/admin` and, under **App update**, upload the new signed APK.
+2. On each phone, on home Wi-Fi, open **Family** and tap **Update Lore to …**. Home also shows a hint.
+
+   The first time, Android asks to allow Lore to install apps. Every update shows Android's own confirmation.
+
+The server only accepts Lore APKs newer than the one it has. Updates keep pairing and queues, as long as every release is signed with the same key.
+
 ## Pair a phone
 
 1. Install the app: the release APK above, or `dotnet build src/Lore.App -f net10.0-android -t:Install` with the phone connected over USB debugging.
