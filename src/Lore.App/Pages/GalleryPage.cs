@@ -22,6 +22,15 @@ public sealed class GalleryMonth(DateTime month) : ObservableCollection<GalleryI
 {
 	public DateTime Month { get; } = month;
 	public string Title => Month.ToString("MMMM yyyy");
+	public bool AllSelected => Count > 0 && this.All(i => i.IsSelected);
+	public string ActionText => AllSelected ? "Clear" : "Select all";
+
+	/// <summary>Call after any item's selection changes, so the header button reads right.</summary>
+	public void SelectionChanged()
+	{
+		OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(AllSelected)));
+		OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ActionText)));
+	}
 }
 
 /// <summary>Lore's own photo/video chooser, reading originals from MediaStore so location data is kept.</summary>
@@ -61,9 +70,18 @@ public sealed class GalleryPage : ContentPage
 			// Month breaks, as in the Library, so a long camera roll is easy to scan.
 			GroupHeaderTemplate = new DataTemplate(() =>
 			{
-				var header = new Label { FontFamily = "OpenSansSemibold", FontSize = 16, Padding = new Thickness(8, 16, 8, 6) };
-				header.SetBinding(Label.TextProperty, static (GalleryMonth m) => m.Title);
-				return header;
+				var title = new Label { FontFamily = "OpenSansSemibold", FontSize = 16, VerticalOptions = LayoutOptions.Center };
+				title.SetBinding(Label.TextProperty, static (GalleryMonth m) => m.Title);
+				// The whole month in one tap; the text button keeps the 48dp target inside the header's rhythm.
+				var all = new Button { Style = (Style)Application.Current!.Resources["TextButton"], VerticalOptions = LayoutOptions.Center };
+				all.SetBinding(Button.TextProperty, static (GalleryMonth m) => m.ActionText);
+				all.Clicked += (s, _) => { if (((View)s!).BindingContext is GalleryMonth m) ToggleMonth(m); };
+				return new Grid
+				{
+					Padding = new Thickness(8, 8, 4, 0),
+					ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)],
+					Children = { title, all.Column(1) },
+				};
 			}),
 			ItemTemplate = new DataTemplate(() =>
 			{
@@ -123,6 +141,7 @@ public sealed class GalleryPage : ContentPage
 					if (item.IsSelected) _picked[item.Media.Id] = item.Media;
 					else _picked.Remove(item.Media.Id);
 					_send.Text = $"Upload ({_picked.Count})";
+					_months.FirstOrDefault(m => m.Contains(item))?.SelectionChanged();
 				};
 				tile.GestureRecognizers.Add(tap);
 				return tile;
@@ -173,8 +192,24 @@ public sealed class GalleryPage : ContentPage
 			group.Add(new GalleryItem(m, _inLore.TryGetValue(m.ContentUri.ToString()!, out var size) && size == m.Size)
 				{ IsSelected = _picked.ContainsKey(m.Id) });
 		}
+		foreach (var month in _months) month.SelectionChanged();
 		_end = page.Count < PageSize;
 		_loading = false;
+	}
+
+	void ToggleMonth(GalleryMonth month)
+	{
+		// A month can run past the loaded page: load until the next month starts, so "all" means all.
+		while (!_end && _months.LastOrDefault() == month) LoadMore();
+		var select = !month.AllSelected;
+		foreach (var item in month)
+		{
+			item.IsSelected = select;
+			if (select) _picked[item.Media.Id] = item.Media;
+			else _picked.Remove(item.Media.Id);
+		}
+		month.SelectionChanged();
+		_send.Text = $"Upload ({_picked.Count})";
 	}
 
 	void SelectKind(int index)

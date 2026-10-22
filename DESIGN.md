@@ -245,7 +245,7 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 - **Selecting:** every tile shows a 24px white ring (2px stroke, 20% black fill) in the top-left corner, 6px inset.
 - **Selected:** the photo insets by 12px onto a tonal tile (Pale Celadon; Deep Archive Green at night), and the ring fills with Archive Green (Sage Mist at night) and a drawn check. Never cover the photo with an overlay: it must stay recognisable.
 - The device-photo chooser uses the same selection language, with the ring always visible.
-- The device-photo chooser opens with three chips under the nav bar (**All**, **Photos**, **Videos**; one active, as on Places) and groups tiles under the same month headers as the Library. Order is newest first by date taken, using the date added when a file has none. Picks survive switching chips; the toolbar's **Upload (n)** counts them all.
+- The device-photo chooser opens with three chips under the nav bar (**All**, **Photos**, **Videos**; one active, as on Places) and groups tiles under the same month headers as the Library. Order is newest first by date taken, using the date added when a file has none. Picks survive switching chips; the toolbar's **Upload (n)** counts them all. Each month header carries a right-aligned text button, **Select all**, which reads **Clear** once every item in that month is picked (it loads the rest of the month first if it runs past the loaded page).
 - Tap opens the viewer, or toggles selection while selecting.
 
 ### Month Header
