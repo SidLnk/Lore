@@ -1,6 +1,23 @@
-# Lore
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="design/logo/final/horizontal/lore-horizontal-white.svg">
+  <img alt="Lore" src="design/logo/final/lore-horizontal.svg" height="64">
+</picture>
 
-Private, LAN-only family photo and video library. The server runs in Docker on the home PC. Media is stored on the host disk (`G:\lore`). The Android app is .NET MAUI.
+A private family photo and video library that lives on your own PC. Phones on the home Wi-Fi upload full-quality originals to it, and any paired phone can browse the whole family's media. No cloud, no account, no subscription: nothing leaves the home network.
+
+- **Originals kept exactly.** Byte-identical files, content-addressed on your own disk, with duplicates detected by SHA-256.
+- **Reliable uploads.** Chunked and resumable; they continue in the background, pause off home Wi-Fi and pick up after drops or restarts.
+- **Browse by person, place and time.** A month-grouped timeline with filters for owner, type, dates, favorites, folders, albums, tags and location, plus a Places view built from photo GPS (no map tiles, no internet).
+- **Organize without moving files.** Virtual folders, albums, tags, captions, favorites, bulk edits and a recycle bin.
+- **Phones and tablets.** Android app with a navigation rail on tablets and landscape, dark mode and large-text support. Photos, videos and HEIC.
+
+## Download
+
+Get the Android app (Android 8.0+) from [Releases](https://github.com/SidLnk/Lore/releases/latest): open `lore-1.0.apk` on the phone and allow **Install unknown apps**. The app needs a Lore server on your network; set one up below, then [pair the phone](#pair-a-phone).
+
+## How it fits together
+
+The server is ASP.NET Core in Docker on a Windows PC, with media on a host disk (`G:\lore`) and SQLite for the catalogue. The Android app is .NET MAUI.
 
 ```
 src/Lore.Api        ASP.NET Core API (SQLite + Dapper), admin page at /admin
@@ -12,7 +29,7 @@ tests/Lore.Api.Tests  API + upload engine tests against an in-memory server
 
 ## Run the server
 
-1. Copy `.env.example` to `.env` and set `LORE_ADMIN_PASSWORD`.
+1. Copy `.env.example` to `.env`. Set `LORE_ADMIN_PASSWORD`, and `LORE_FAMILY` to your family members' names, comma separated (they seed the first start only, and never enter the repo).
 2. Run `docker compose up -d --build`.
 3. In an elevated PowerShell, mark the home network as Private and let LAN devices reach port 80:
    ```powershell
