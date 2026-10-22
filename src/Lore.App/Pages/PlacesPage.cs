@@ -93,7 +93,7 @@ public sealed class PlacesPage : ContentPage
 		title.SetBinding(Label.TextProperty, static (PlaceRow r) => r.Title);
 		var detail = new Label { FontSize = 13, Opacity = 0.7 };
 		detail.SetBinding(Label.TextProperty, static (PlaceRow r) => r.Detail);
-		var maps = new Button { Text = "Maps", Padding = new Thickness(12, 0), HeightRequest = 40, VerticalOptions = LayoutOptions.Center };
+		var maps = new Button { Text = "Maps", Style = (Style)Application.Current!.Resources["SecondaryButton"], VerticalOptions = LayoutOptions.Center };
 		maps.SetBinding(Button.CommandParameterProperty, static (PlaceRow r) => r.Place);
 		// Hands off to the phone's maps app (uses the internet there; Lore itself stays offline).
 		maps.Clicked += async (s, _) =>

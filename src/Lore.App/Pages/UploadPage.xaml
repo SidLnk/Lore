@@ -7,35 +7,39 @@
 	x:DataType="pages:UploadViewModel"
 	Title="Upload">
 
-	<Grid RowDefinitions="Auto,Auto,Auto,*" Padding="12" RowSpacing="10">
-		<Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+	<!-- Choose (who it belongs to, then what) / queue status / queue. One filled action on the screen. -->
+	<Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,8,16,0">
+		<Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
 			<Label Text="Belongs to" VerticalOptions="Center" />
 			<Picker Grid.Column="1" ItemsSource="{Binding Owners}" SelectedItem="{Binding SelectedOwner}" Title="Owner" />
 		</Grid>
-		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+		<VerticalStackLayout Grid.Row="1" Spacing="0" Margin="0,8,0,0">
 			<Button Text="Choose photos &amp; videos" Command="{Binding ChooseFromPhoneCommand}" />
-			<Button Grid.Column="1" Text="System picker" Command="{Binding SystemPickerCommand}" />
-		</Grid>
-		<Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-			<Label Text="{Binding Summary}" VerticalOptions="Center" />
-			<Button Grid.Column="1" Text="Retry failed" Command="{Binding RetryFailedCommand}" IsVisible="{Binding HasFailed}" />
-			<Button Grid.Column="2" Text="Clear done" Command="{Binding ClearDoneCommand}" />
+			<Button Text="Use system picker" Style="{StaticResource TextButton}" HorizontalOptions="Start" Margin="-12,0,0,0"
+				Command="{Binding SystemPickerCommand}" />
+		</VerticalStackLayout>
+		<Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,16,-12,0">
+			<Label Text="{Binding Summary}" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
+			<Button Grid.Column="1" Text="Retry failed" Style="{StaticResource TextButton}" Command="{Binding RetryFailedCommand}" IsVisible="{Binding HasFailed}" />
+			<Button Grid.Column="2" Text="Clear done" Style="{StaticResource TextButton}" Command="{Binding ClearDoneCommand}" />
 		</Grid>
 		<CollectionView x:Name="Queue" Grid.Row="3" ItemsSource="{Binding Rows}">
 			<CollectionView.ItemTemplate>
 				<DataTemplate x:DataType="pages:QueueRow">
-					<VerticalStackLayout Padding="0,6" Spacing="2">
+					<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="6" Padding="0,10">
 						<Label Text="{Binding Name}" LineBreakMode="MiddleTruncation" />
-						<ProgressBar Progress="{Binding Progress}" />
-						<Label Text="{Binding Detail}" FontSize="12" Opacity="0.7">
+						<Label Grid.Column="1" Text="{Binding Detail}" Style="{StaticResource Quiet}" VerticalOptions="Center">
 							<Label.Triggers>
 								<DataTrigger TargetType="Label" Binding="{Binding IsFailed}" Value="True">
-									<Setter Property="TextColor" Value="Red" />
+									<Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Danger}, Dark={StaticResource DangerDark}}" />
 									<Setter Property="Opacity" Value="1" />
 								</DataTrigger>
 							</Label.Triggers>
 						</Label>
-					</VerticalStackLayout>
+						<ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Progress="{Binding Progress}" />
+						<Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding ErrorText}" FontSize="13" IsVisible="{Binding IsFailed}"
+							TextColor="{AppThemeBinding Light={StaticResource Danger}, Dark={StaticResource DangerDark}}" />
+					</Grid>
 				</DataTemplate>
 			</CollectionView.ItemTemplate>
 		</CollectionView>

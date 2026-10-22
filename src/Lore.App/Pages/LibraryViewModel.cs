@@ -97,7 +97,8 @@ public partial class LibraryViewModel : ObservableObject
 	[ObservableProperty] public partial FilterOption SelectedTag { get; set; }
 	[ObservableProperty] public partial FilterOption SelectedDevice { get; set; }
 	[ObservableProperty] public partial FilterOption SelectedGps { get; set; }
-	[ObservableProperty] public partial bool ShowMoreFilters { get; set; }
+	/// <summary>Shows the from/to date pickers under the chips when "Choose dates…" was picked.</summary>
+	[ObservableProperty] public partial bool ShowCustomDates { get; set; }
 	[ObservableProperty] public partial bool IsRefreshing { get; set; }
 	[ObservableProperty] public partial string? Message { get; set; }
 	[ObservableProperty] public partial bool IsSelecting { get; set; }
@@ -121,8 +122,120 @@ public partial class LibraryViewModel : ObservableObject
 
 	void FilterChanged()
 	{
+		NotifyChips();
 		if (!_suspendReload) _ = ReloadAsync();
 	}
+
+	// ---- Filter chips: one horizontal row instead of a stack of pickers, so photos start near the top. ----
+
+	string _datePreset = "Any time";
+
+	public string OwnerChip => SelectedOwner.Id == null ? "Everyone" : SelectedOwner.Name;
+	public bool OwnerActive => SelectedOwner.Id != null;
+	public string TypeChip => TypeIndex switch { 1 => "Photos", 2 => "Videos", _ => "Photos & videos" };
+	public bool TypeActive => TypeIndex != 0;
+	public string DateChip => !UseDateRange ? "Any time" : ShowCustomDates ? $"{FromDate:d MMM} – {ToDate:d MMM yyyy}" : _datePreset;
+	public string FolderChip => SelectedFolder.Value == null ? "Folder" : SelectedFolder.Label;
+	public string AlbumChip => SelectedAlbum.Value == null ? "Album" : SelectedAlbum.Label;
+	public string TagChip => SelectedTag.Value == null ? "Tag" : SelectedTag.Label;
+	public string DeviceChip => SelectedDevice.Value == null ? "Device" : SelectedDevice.Label;
+	public string LocationChip => SelectedGps.Value == null ? "Location" : SelectedGps.Label;
+	public bool FolderActive => SelectedFolder.Value != null;
+	public bool AlbumActive => SelectedAlbum.Value != null;
+	public bool TagActive => SelectedTag.Value != null;
+	public bool DeviceActive => SelectedDevice.Value != null;
+	public bool LocationActive => SelectedGps.Value != null;
+	public bool HasArea => Area != null;
+	public bool AnyActive => OwnerActive || TypeActive || UseDateRange || FavoritesOnly || FolderActive || AlbumActive
+		|| TagActive || DeviceActive || LocationActive || HasArea;
+
+	static readonly string[] ChipProperties =
+	[
+		nameof(OwnerChip), nameof(OwnerActive), nameof(TypeChip), nameof(TypeActive), nameof(DateChip),
+		nameof(FolderChip), nameof(AlbumChip), nameof(TagChip), nameof(DeviceChip), nameof(LocationChip),
+		nameof(FolderActive), nameof(AlbumActive), nameof(TagActive), nameof(DeviceActive), nameof(LocationActive),
+		nameof(HasArea), nameof(AnyActive),
+	];
+
+	void NotifyChips()
+	{
+		foreach (var name in ChipProperties) OnPropertyChanged(name);
+	}
+
+	static Task<string?> SheetAsync(string title, IEnumerable<string> options) =>
+		Shell.Current.DisplayActionSheetAsync(title, "Cancel", null, [.. options]);
+
+	[RelayCommand]
+	async Task PickOwnerAsync()
+	{
+		var choice = await SheetAsync("Whose photos", Owners.Select(o => o.Name));
+		if (Owners.FirstOrDefault(o => o.Name == choice) is { } owner) SelectedOwner = owner;
+	}
+
+	[RelayCommand]
+	async Task PickTypeAsync()
+	{
+		string[] options = ["Photos & videos", "Photos", "Videos"];
+		var index = Array.IndexOf(options, await SheetAsync("Show", options));
+		if (index >= 0) TypeIndex = index;
+	}
+
+	[RelayCommand]
+	async Task PickDatesAsync()
+	{
+		var today = DateTime.Today;
+		(string Label, DateTime From, DateTime To)[] presets =
+		[
+			("This month", new DateTime(today.Year, today.Month, 1), today),
+			("Last 3 months", today.AddMonths(-3), today),
+			("This year", new DateTime(today.Year, 1, 1), today),
+			("Last year", new DateTime(today.Year - 1, 1, 1), new DateTime(today.Year - 1, 12, 31)),
+		];
+		var choice = await SheetAsync("When", ["Any time", .. presets.Select(p => p.Label), "Choose dates…"]);
+		if (choice is null or "Cancel") return;
+
+		_suspendReload = true;
+		ShowCustomDates = choice == "Choose dates…";
+		if (choice == "Any time") UseDateRange = false;
+		else if (presets.FirstOrDefault(p => p.Label == choice) is { Label: not null } preset)
+		{
+			(_datePreset, FromDate, ToDate) = preset;
+			UseDateRange = true;
+		}
+		else UseDateRange = true; // custom: keep the current from/to, now editable below the chips
+		_suspendReload = false;
+		FilterChanged();
+	}
+
+	[RelayCommand]
+	void ToggleFavorites() => FavoritesOnly = !FavoritesOnly;
+
+	[RelayCommand] Task PickFolderAsync() => PickOptionAsync("Folder", Folders, o => SelectedFolder = o);
+	[RelayCommand] Task PickAlbumAsync() => PickOptionAsync("Album", Albums, o => SelectedAlbum = o);
+	[RelayCommand] Task PickTagAsync() => PickOptionAsync("Tag", Tags, o => SelectedTag = o);
+	[RelayCommand] Task PickDeviceAsync() => PickOptionAsync("Uploaded from", Devices, o => SelectedDevice = o);
+
+	[RelayCommand]
+	async Task PickLocationAsync()
+	{
+		var choice = await SheetAsync("Location", GpsOptions.Select(o => o.Label));
+		if (GpsOptions.FirstOrDefault(o => o.Label == choice) is { } option) SelectedGps = option;
+	}
+
+	async Task PickOptionAsync(string title, IReadOnlyList<FilterOption> options, Action<FilterOption> select)
+	{
+		await LoadFilterOptionsAsync(); // folders, albums and tags change in Organize
+		if (options.Count <= 1)
+		{
+			await Shell.Current.DisplayAlertAsync(title, $"There are no {title.ToLowerInvariant()}s to filter by yet.", "OK");
+			return;
+		}
+		var choice = await SheetAsync(title, options.Select(o => o.Label));
+		if (options.FirstOrDefault(o => o.Label == choice) is { } option) select(option);
+	}
+
+	[RelayCommand]
+	Task ClearFiltersAsync() => ShowOnlyAsync();
 
 	MediaQuery Query => new(
 		From: UseDateRange ? FromDate.Date : null,
@@ -143,8 +256,8 @@ public partial class LibraryViewModel : ObservableObject
 	{
 		await ShowOnlyAsync(reload: false);
 		Area = area;
-		AreaLabel = "Place: " + label;
-		ShowMoreFilters = false;
+		AreaLabel = label;
+		NotifyChips();
 		await ReloadAsync();
 	}
 
@@ -153,6 +266,7 @@ public partial class LibraryViewModel : ObservableObject
 	{
 		Area = null;
 		AreaLabel = null;
+		NotifyChips();
 		await ReloadAsync();
 	}
 
@@ -165,13 +279,13 @@ public partial class LibraryViewModel : ObservableObject
 		(Area, AreaLabel) = (null, null);
 		SelectedOwner = Owners[0];
 		TypeIndex = 0;
-		UseDateRange = FavoritesOnly = false;
+		UseDateRange = FavoritesOnly = ShowCustomDates = false;
 		(SelectedDevice, SelectedGps) = (AnyDevice, AnyLocation);
 		SelectedFolder = Folders.FirstOrDefault(f => Equals(f.Value, folderId)) ?? AnyFolder;
 		SelectedAlbum = Albums.FirstOrDefault(a => Equals(a.Value, albumId)) ?? AnyAlbum;
 		SelectedTag = Tags.FirstOrDefault(t => Equals(t.Value, tag)) ?? AnyTag;
-		ShowMoreFilters = true;
 		_suspendReload = false;
+		NotifyChips();
 		if (reload) await ReloadAsync();
 	}
 
@@ -263,13 +377,6 @@ public partial class LibraryViewModel : ObservableObject
 		_viewer.Index = all.IndexOf(item);
 		_viewer.FromBin = IsBin;
 		await Shell.Current.GoToAsync("viewer");
-	}
-
-	[RelayCommand]
-	void ToggleMoreFilters()
-	{
-		ShowMoreFilters = !ShowMoreFilters;
-		if (ShowMoreFilters) _ = LoadFilterOptionsAsync();
 	}
 
 	public void StartSelecting() => IsSelecting = true;

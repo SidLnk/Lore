@@ -52,7 +52,6 @@ public partial class LibraryPage : ContentPage
 			_seenVersion = _viewer.Version;
 			await _vm.ReloadAsync();
 		}
-		if (_vm.ShowMoreFilters) await _vm.LoadFilterOptionsAsync(); // folders/albums/tags may have changed in Organize
 	}
 }
 

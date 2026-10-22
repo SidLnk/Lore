@@ -11,8 +11,8 @@ public sealed class HomePage : ContentPage
 	readonly Uploads _uploads;
 	readonly ViewerState _viewer;
 	readonly Label _storage = new();
-	readonly Label _queue = new() { IsVisible = false };
-	readonly Button _bin = new() { Text = "Recycle bin" };
+	readonly Label _queue = new() { IsVisible = false, FontFamily = "OpenSansSemibold" };
+	readonly Button _bin = new() { Text = "Recycle bin", HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(-12, 0, 0, 0) };
 	readonly CollectionView _recent;
 	List<MediaItem> _items = [];
 
@@ -22,6 +22,7 @@ public sealed class HomePage : ContentPage
 		_uploads = uploads;
 		_viewer = viewer;
 		Title = "Home";
+		_bin.Style = (Style)Application.Current!.Resources["TextButton"];
 
 		_recent = new CollectionView
 		{
@@ -29,7 +30,8 @@ public sealed class HomePage : ContentPage
 			SelectionMode = SelectionMode.Single,
 			ItemTemplate = new DataTemplate(() =>
 			{
-				var image = new Image { Aspect = Aspect.AspectFill, BackgroundColor = Application.Current!.RequestedTheme == AppTheme.Dark ? Color.FromArgb("#2A2A2A") : Color.FromArgb("#E6E6E6"), HeightRequest = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 3 - 2 };
+				var image = new Image { Aspect = Aspect.AspectFill, HeightRequest = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 3 - 2 };
+				image.SetAppThemeColor(BackgroundColorProperty, Color.FromArgb("#E6E6E6"), Color.FromArgb("#2A2A2A"));
 				image.SetBinding(Image.SourceProperty, static (MediaItem m) => m.ThumbUrl);
 				return image;
 			}),
@@ -45,18 +47,27 @@ public sealed class HomePage : ContentPage
 		};
 		_bin.Clicked += async (_, _) => await Shell.Current.GoToAsync("bin");
 
+		var seeAll = new Button { Text = "See all", Style = (Style)Application.Current.Resources["TextButton"] };
+		seeAll.Clicked += async (_, _) => await Shell.Current.GoToAsync("//library");
+
+		// Status reads as one quiet block; the photos below run edge to edge like the Library.
 		Content = new Grid
 		{
-			Padding = new Thickness(16, 8),
-			RowSpacing = 8,
-			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
+			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
 			Children =
 			{
-				_storage,
-				_queue.Row(1),
-				_bin.Row(2),
-				new Label { Text = "Recent", FontSize = 18, FontFamily = "OpenSansSemibold", Margin = new Thickness(0, 8, 0, 0) }.Row(3),
-				_recent.Row(4),
+				new VerticalStackLayout { Padding = new Thickness(16, 8, 16, 0), Spacing = 4, Children = { _queue, _storage, _bin } },
+				new Grid
+				{
+					Padding = new Thickness(16, 16, 4, 4),
+					ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)],
+					Children =
+					{
+						new Label { Text = "Recent", Style = (Style)Application.Current.Resources["SectionTitle"], VerticalOptions = LayoutOptions.Center },
+						seeAll.Column(1),
+					},
+				}.Row(1),
+				_recent.Row(2),
 			},
 		};
 	}
@@ -65,7 +76,7 @@ public sealed class HomePage : ContentPage
 	{
 		base.OnAppearing();
 		var pending = (await _uploads.Queue.AllAsync()).Count(i => i.Status is UploadStatus.Pending or UploadStatus.Uploading);
-		_queue.Text = $"{pending} waiting to upload";
+		_queue.Text = $"{Format.Plural(pending, "item")} waiting to upload";
 		_queue.IsVisible = pending > 0;
 
 		if (_session.Api is not { } api) return;
@@ -74,8 +85,8 @@ public sealed class HomePage : ContentPage
 			var stats = await api.GetStorageAsync();
 			var used = stats.Library.Sum(b => b.Bytes);
 			var count = stats.Library.Sum(b => b.Count);
-			_storage.Text = $"{count:N0} items · {Format.Bytes(used)} in Lore · {Format.Bytes(stats.VolumeFreeBytes)} free on the home PC";
-			_bin.Text = stats.BinCount == 0 ? "Recycle bin" : $"Recycle bin ({stats.BinCount} · {Format.Bytes(stats.BinBytes)})";
+			_storage.Text = $"{Format.Plural(count, "item")} · {Format.Bytes(used)} in Lore · {Format.Bytes(stats.VolumeFreeBytes)} free on the home PC";
+			_bin.Text = stats.BinCount == 0 ? "Recycle bin" : $"Recycle bin · {Format.Plural(stats.BinCount, "item")}";
 			_items = (await api.GetMediaAsync(new MediaQuery(), limit: 12)).Items.Select(m => new MediaItem(m, api)).ToList();
 			_recent.ItemsSource = _items;
 		}
@@ -90,30 +101,33 @@ public sealed class HomePage : ContentPage
 public sealed class FamilyPage : ContentPage
 {
 	readonly Session _session;
-	readonly VerticalStackLayout _members = new() { Spacing = 6 };
+	readonly VerticalStackLayout _members = new() { Spacing = 16 };
 
 	public FamilyPage(Session session)
 	{
 		_session = session;
 		Title = "Family";
+		var styles = Application.Current!.Resources;
 		var owners = session.Family.Select(f => new OwnerOption(f.Id, f.Name)).ToList();
 		var picker = new Picker { Title = "This phone belongs to", ItemsSource = owners, SelectedItem = owners.FirstOrDefault(o => o.Id == session.DefaultOwnerId) };
-		var status = new Label { FontSize = 12 };
+		var status = new Label { Style = (Style)styles["Quiet"], IsVisible = false };
 		picker.SelectedIndexChanged += async (_, _) =>
 		{
 			if (picker.SelectedItem is not OwnerOption { Id: { } id } || id == session.DefaultOwnerId) return;
 			try
 			{
 				await session.SetDefaultOwnerAsync(id);
-				status.Text = "Saved.";
+				status.IsVisible = true;
+				status.Text = "Saved. New uploads from this phone belong to " + session.MemberName(id) + ".";
 			}
 			catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
 			{
+				status.IsVisible = true;
 				status.Text = "Couldn't save. Are you on home Wi-Fi?";
 			}
 		};
 
-		var unpair = new Button { Text = "Unpair this phone" };
+		var unpair = new Button { Text = "Unpair this phone", Style = (Style)styles["DangerTextButton"], HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(-12, 0, 0, 0) };
 		unpair.Clicked += async (_, _) =>
 		{
 			if (!await DisplayAlertAsync("Unpair?", "This phone will stop uploading and browsing until it is paired again.", "Unpair", "Cancel")) return;
@@ -121,19 +135,27 @@ public sealed class FamilyPage : ContentPage
 			((App)Application.Current!).ShowPairing(Window);
 		};
 
+		// Three groups, separated by space rather than lines: who's in the family, this phone, leaving.
 		Content = new ScrollView
 		{
 			Content = new VerticalStackLayout
 			{
-				Padding = 24,
-				Spacing = 12,
+				Padding = new Thickness(16, 16, 16, 24),
+				Spacing = 32,
 				Children =
 				{
 					_members,
-					new Label { Text = "This phone belongs to", Margin = new Thickness(0, 16, 0, 0) },
-					picker,
-					status,
-					new Label { Text = "Server: " + session.Api?.BaseAddress, FontSize = 12, Opacity = 0.7 },
+					new VerticalStackLayout
+					{
+						Spacing = 4,
+						Children =
+						{
+							new Label { Text = "This phone", Style = (Style)styles["SectionTitle"] },
+							picker,
+							status,
+							new Label { Text = "Server " + session.Api?.BaseAddress, Style = (Style)styles["Quiet"] },
+						},
+					},
 					unpair,
 				},
 			},
@@ -152,12 +174,19 @@ public sealed class FamilyPage : ContentPage
 		{
 			var mine = stats?.Library.Where(b => b.OwnerId == m.Id).ToList() ?? [];
 			int Count(string type) => mine.Where(b => b.MediaType == type).Sum(b => b.Count);
-			_members.Add(new Label { Text = m.Name, FontSize = 18, FontFamily = "OpenSansSemibold" });
-			_members.Add(new Label
+			_members.Add(new VerticalStackLayout
 			{
-				Text = stats == null ? "Totals unavailable offline"
-					: $"{Count(MediaTypes.Photo):N0} photos · {Count(MediaTypes.Video):N0} videos · {Format.Bytes(mine.Sum(b => b.Bytes))}",
-				Opacity = 0.7,
+				Spacing = 2,
+				Children =
+				{
+					new Label { Text = m.Name, Style = (Style)Application.Current!.Resources["SectionTitle"] },
+					new Label
+					{
+						Text = stats == null ? "Totals unavailable offline"
+							: $"{Format.Plural(Count(MediaTypes.Photo), "photo")} · {Format.Plural(Count(MediaTypes.Video), "video")} · {Format.Bytes(mine.Sum(b => b.Bytes))}",
+						Style = (Style)Application.Current!.Resources["Quiet"],
+					},
+				},
 			});
 		}
 	}

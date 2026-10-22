@@ -11,6 +11,9 @@
     <Color x:Key="Secondary">#DCEBE3</Color>
     <Color x:Key="SecondaryDarkText">#6FA88C</Color>
     <Color x:Key="Tertiary">#1B3329</Color>
+    <!-- Destructive actions (unpair, erase). -->
+    <Color x:Key="Danger">#B3261E</Color>
+    <Color x:Key="DangerDark">#FFB4AB</Color>
 
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>

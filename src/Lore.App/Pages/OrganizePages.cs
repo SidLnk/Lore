@@ -183,7 +183,7 @@ public sealed class InfoPage : ContentPage
 		var actions = new FlexLayout { Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap };
 		foreach (var action in new[] { "Add to album", "Remove from album", "Add tags", "Remove tags", "Move to folder", "Set owner" })
 		{
-			var b = new Button { Text = action, Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 0), HeightRequest = 40 };
+			var b = new Button { Text = action, Style = (Style)Application.Current!.Resources["SecondaryButton"], Margin = new Thickness(0, 0, 8, 8) };
 			b.Clicked += async (_, _) =>
 			{
 				if (!await _organizer.EditAsync(this, [_item.Dto.Id], action)) return;
@@ -194,6 +194,8 @@ public sealed class InfoPage : ContentPage
 		}
 
 		// Hands off to the phone's maps app (needs internet there; Lore itself stays offline).
+		_maps.Style = (Style)Application.Current!.Resources["SecondaryButton"];
+		_maps.HorizontalOptions = LayoutOptions.Start;
 		_maps.Clicked += async (_, _) =>
 		{
 			if (_location is var (lat, lon)) await Map.Default.TryOpenAsync(lat, lon, new MapLaunchOptions { Name = _item.Dto.OriginalFilename });

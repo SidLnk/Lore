@@ -4,45 +4,35 @@
 	xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 	xmlns:pages="clr-namespace:Lore.App.Pages"
-	xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
 	x:Name="Root"
 	x:DataType="pages:LibraryViewModel"
 	Title="Library">
 
-	<ContentPage.Resources>
-		<toolkit:IsNotNullConverter x:Key="IsNotNull" />
-	</ContentPage.Resources>
+	<Grid RowDefinitions="Auto,Auto,*">
+		<!-- One scrolling row of filter chips. "Clear all" leads once anything is set, so it is never scrolled out of reach. -->
+		<ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" IsVisible="{Binding ShowFilters}">
+			<HorizontalStackLayout Spacing="8" Padding="12,0">
+				<Button Margin="-8,0,0,0" Text="Clear all" Style="{StaticResource TextButton}" IsVisible="{Binding AnyActive}" Command="{Binding ClearFiltersCommand}" />
+				<pages:Chip Text="{Binding AreaLabel}" IsActive="True" Trailing="Close" IsVisible="{Binding HasArea}" Command="{Binding ClearAreaCommand}" />
+				<pages:Chip Text="{Binding OwnerChip}" IsActive="{Binding OwnerActive}" Trailing="Chevron" Command="{Binding PickOwnerCommand}" />
+				<pages:Chip Text="{Binding TypeChip}" IsActive="{Binding TypeActive}" Trailing="Chevron" Command="{Binding PickTypeCommand}" />
+				<pages:Chip Text="{Binding DateChip}" IsActive="{Binding UseDateRange}" Trailing="Chevron" Command="{Binding PickDatesCommand}" />
+				<pages:Chip Text="Favorites" IsActive="{Binding FavoritesOnly}" Command="{Binding ToggleFavoritesCommand}" />
+				<pages:Chip Text="{Binding AlbumChip}" IsActive="{Binding AlbumActive}" Trailing="Chevron" Command="{Binding PickAlbumCommand}" />
+				<pages:Chip Text="{Binding FolderChip}" IsActive="{Binding FolderActive}" Trailing="Chevron" Command="{Binding PickFolderCommand}" />
+				<pages:Chip Text="{Binding TagChip}" IsActive="{Binding TagActive}" Trailing="Chevron" Command="{Binding PickTagCommand}" />
+				<pages:Chip Text="{Binding LocationChip}" IsActive="{Binding LocationActive}" Trailing="Chevron" Command="{Binding PickLocationCommand}" />
+				<pages:Chip Text="{Binding DeviceChip}" IsActive="{Binding DeviceActive}" Trailing="Chevron" Command="{Binding PickDeviceCommand}" />
+			</HorizontalStackLayout>
+		</ScrollView>
 
-	<Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-		<Grid ColumnDefinitions="*,*" ColumnSpacing="8" Padding="8,4" IsVisible="{Binding ShowFilters}">
-			<Picker ItemsSource="{Binding Owners}" SelectedItem="{Binding SelectedOwner}" Title="Owner" />
-			<Picker Grid.Column="1" ItemsSource="{Binding Types}" SelectedIndex="{Binding TypeIndex}" Title="Type" />
-		</Grid>
-		<FlexLayout Grid.Row="1" Wrap="Wrap" AlignItems="Center" Padding="8,0" IsVisible="{Binding ShowFilters}">
-			<CheckBox IsChecked="{Binding UseDateRange}" VerticalOptions="Center" />
-			<Label Text="Dates" VerticalOptions="Center" />
-			<DatePicker Date="{Binding FromDate}" IsEnabled="{Binding UseDateRange}" />
-			<Label Text="to" VerticalOptions="Center" Margin="4,0" />
-			<DatePicker Date="{Binding ToDate}" IsEnabled="{Binding UseDateRange}" />
-			<CheckBox IsChecked="{Binding FavoritesOnly}" VerticalOptions="Center" />
-			<Label Text="Favorites" VerticalOptions="Center" />
-			<Button Text="More filters" Command="{Binding ToggleMoreFiltersCommand}" Margin="8,0,0,0" Padding="12,0" HeightRequest="40" />
-		</FlexLayout>
-		<Grid Grid.Row="2" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" Padding="8,0"
-			IsVisible="{Binding ShowMoreFilters}">
-			<Picker ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder}" Title="Folder" />
-			<Picker Grid.Column="1" ItemsSource="{Binding Albums}" SelectedItem="{Binding SelectedAlbum}" Title="Album" />
-			<Picker Grid.Row="1" ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" Title="Tag" />
-			<Picker Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}" Title="Device" />
-			<Picker Grid.Row="2" ItemsSource="{Binding GpsOptions}" SelectedItem="{Binding SelectedGps}" Title="Location" />
-		</Grid>
+		<HorizontalStackLayout Grid.Row="1" Spacing="8" Padding="16,0,16,4" IsVisible="{Binding ShowCustomDates}">
+			<DatePicker Date="{Binding FromDate}" />
+			<Label Text="to" VerticalOptions="Center" />
+			<DatePicker Date="{Binding ToDate}" />
+		</HorizontalStackLayout>
 
-		<Grid Grid.Row="3" ColumnDefinitions="*,Auto" Padding="8,4" IsVisible="{Binding Area, Converter={StaticResource IsNotNull}}">
-			<Label Text="{Binding AreaLabel}" VerticalOptions="Center" FontFamily="OpenSansSemibold" />
-			<Button Grid.Column="1" Text="Clear place" Command="{Binding ClearAreaCommand}" Padding="12,0" HeightRequest="40" />
-		</Grid>
-
-		<RefreshView Grid.Row="4" IsRefreshing="{Binding IsRefreshing}" Command="{Binding ReloadCommand}">
+		<RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding ReloadCommand}">
 			<CollectionView
 				ItemsSource="{Binding Groups}"
 				IsGrouped="True"

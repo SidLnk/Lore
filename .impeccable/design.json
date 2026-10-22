@@ -1,0 +1,496 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T02:40:57.880893+00:00",
+  "title": "Design System: Lore",
+  "extensions": {
+    "colorMeta": {
+      "archive-green": {
+        "role": "primary",
+        "displayName": "Archive Green",
+        "canonical": "#2B4C3F",
+        "tonalRamp": [
+          "#1C3128",
+          "#2E5144",
+          "#41725E",
+          "#53937A",
+          "#76B29A",
+          "#9DC8B7",
+          "#C8E0D6",
+          "#EFF6F3"
+        ]
+      },
+      "archive-green-deep": {
+        "role": "primary",
+        "displayName": "Deep Archive Green",
+        "canonical": "#1B3329",
+        "tonalRamp": [
+          "#1A3228",
+          "#2C5343",
+          "#3E755E",
+          "#4F9679",
+          "#73B599",
+          "#9BCAB6",
+          "#C6E1D6",
+          "#EEF6F3"
+        ]
+      },
+      "sage-mist": {
+        "role": "secondary",
+        "displayName": "Sage Mist",
+        "canonical": "#8FC1A9",
+        "tonalRamp": [
+          "#1B3127",
+          "#2D5240",
+          "#40735A",
+          "#529474",
+          "#75B395",
+          "#9DC8B3",
+          "#C7E0D4",
+          "#EFF6F2"
+        ]
+      },
+      "sage-text": {
+        "role": "secondary",
+        "displayName": "Sage Text",
+        "canonical": "#6FA88C",
+        "tonalRamp": [
+          "#1D3026",
+          "#304F40",
+          "#436F5A",
+          "#568F73",
+          "#79AE94",
+          "#A0C5B3",
+          "#C9DED4",
+          "#EFF5F2"
+        ]
+      },
+      "pale-celadon": {
+        "role": "secondary",
+        "displayName": "Pale Celadon",
+        "canonical": "#DCEBE3",
+        "tonalRamp": [
+          "#1C3126",
+          "#2E513F",
+          "#417258",
+          "#539271",
+          "#77B192",
+          "#9EC7B1",
+          "#C8DFD3",
+          "#EFF6F2"
+        ]
+      },
+      "linen-mint": {
+        "role": "neutral",
+        "displayName": "Linen Mint",
+        "canonical": "#EEF3F0",
+        "tonalRamp": [
+          "#202D25",
+          "#354B3E",
+          "#4A6956",
+          "#5F876F",
+          "#81A690",
+          "#A5C0B0",
+          "#CCDBD2",
+          "#F0F4F2"
+        ]
+      },
+      "night-moss": {
+        "role": "neutral",
+        "displayName": "Night Moss",
+        "canonical": "#1E2A25",
+        "tonalRamp": [
+          "#202D27",
+          "#354A42",
+          "#4A685C",
+          "#608676",
+          "#82A697",
+          "#A6BFB5",
+          "#CCDBD5",
+          "#F0F4F3"
+        ]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "off-black": {
+        "role": "neutral",
+        "displayName": "Off-Black",
+        "canonical": "#1F1F1F",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "#212121",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "ink-on-sage": {
+        "role": "neutral",
+        "displayName": "Ink on Sage",
+        "canonical": "#242424",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger Red",
+        "canonical": "#B3261E",
+        "tonalRamp": [
+          "#420E0B",
+          "#6D1712",
+          "#99201A",
+          "#C52A21",
+          "#E05048",
+          "#E9827C",
+          "#F3B8B5",
+          "#FBEAE9"
+        ]
+      },
+      "danger-dark": {
+        "role": "tertiary",
+        "displayName": "Danger Red (dark)",
+        "canonical": "#FFB4AB",
+        "tonalRamp": [
+          "#4C0800",
+          "#800E00",
+          "#B21300",
+          "#E61900",
+          "#FF4029",
+          "#FF7666",
+          "#FFB2A8",
+          "#FFE8E5"
+        ]
+      },
+      "tile-placeholder": {
+        "role": "neutral",
+        "displayName": "Tile Placeholder",
+        "canonical": "#E6E6E6",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "tile-placeholder-dark": {
+        "role": "neutral",
+        "displayName": "Tile Placeholder Dark",
+        "canonical": "#2A2A2A",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "gray-200": {
+        "role": "neutral",
+        "displayName": "Gray 200",
+        "canonical": "#C8C8C8",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "gray-300": {
+        "role": "neutral",
+        "displayName": "Gray 300",
+        "canonical": "#ACACAC",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "gray-500": {
+        "role": "neutral",
+        "displayName": "Gray 500",
+        "canonical": "#6E6E6E",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "gray-600": {
+        "role": "neutral",
+        "displayName": "Gray 600",
+        "canonical": "#404040",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "gray-950": {
+        "role": "neutral",
+        "displayName": "Gray 950",
+        "canonical": "#141414",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "App name on pairing and page-level headings; once per screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings inside a page (Organize sections)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Names and key labels: family members, Recent, Info filename."
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "List row titles and month group headers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default text, controls and messages."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Secondary detail at 0.6-0.7 opacity."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sheet-lift",
+        "value": "0 8px 24px rgba(0, 0, 0, 0.16)",
+        "purpose": "Provisional: floating sheets and dialogs only; pages stay flat."
+      }
+    ],
+    "motion": [],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action on management screens (Pair, Save caption, Choose photos & videos).",
+      "html": "<button class=\"ds-btn-primary\">Choose photos &amp; videos</button>",
+      "css": ".ds-btn-primary { font-family: 'Open Sans', system-ui, sans-serif; font-size: 14px; background: #2B4C3F; color: #FFFFFF; border: none; border-radius: 8px; padding: 10px 14px; min-height: 48px; min-width: 48px; cursor: pointer; transition: background .15s; } .ds-btn-primary:hover { background: #1B3329; } .ds-btn-primary:focus-visible { outline: 2px solid #8FC1A9; outline-offset: 2px; } .ds-btn-primary:active { background: #1B3329; } .ds-btn-primary:disabled { background: #C8C8C8; color: #141414; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined: repeated or optional actions (Info edit actions, Maps).",
+      "html": "<button class=\"ds-btn-secondary\">Add to album</button>",
+      "css": ".ds-btn-secondary { font-family: 'Open Sans', system-ui, sans-serif; font-size: 14px; background: transparent; color: #2B4C3F; border: 1px solid #2B4C3F; border-radius: 8px; padding: 10px 14px; min-height: 48px; cursor: pointer; } .ds-btn-secondary:hover { background: #DCEBE3; } .ds-btn-secondary:focus-visible { outline: 2px solid #8FC1A9; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Low-stakes and navigation actions: Recycle bin, See all, Clear all.",
+      "html": "<button class=\"ds-btn-text\">See all</button> <button class=\"ds-btn-text ds-danger\">Unpair this phone</button>",
+      "css": ".ds-btn-text { font-family: 'Open Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; background: transparent; color: #2B4C3F; border: none; padding: 0 12px; min-height: 48px; cursor: pointer; border-radius: 8px; } .ds-btn-text:hover { background: #EEF3F0; } .ds-btn-text:focus-visible { outline: 2px solid #8FC1A9; } .ds-btn-text.ds-danger { color: #B3261E; }"
+    },
+    {
+      "name": "Filter Chips",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "One scrolling row of filters above the grid; tonal when set.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-on\">Sam <svg width=\"10\" height=\"10\" viewBox=\"0 0 10 10\"><path d=\"M1 3l4 4 4-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\"/></svg></button><button class=\"ds-chip\">Any time <svg width=\"10\" height=\"10\" viewBox=\"0 0 10 10\"><path d=\"M1 3l4 4 4-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\"/></svg></button><button class=\"ds-chip\">Favorites</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; } .ds-chip { font: 14px 'Open Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #ACACAC; background: transparent; color: #212121; cursor: pointer; } .ds-chip.ds-on { background: #DCEBE3; border-color: #DCEBE3; color: #2B4C3F; font-weight: 600; } .ds-chip:hover { border-color: #2B4C3F; } .ds-chip:focus-visible { outline: 2px solid #8FC1A9; outline-offset: 2px; }"
+    },
+    {
+      "name": "Photo Tile",
+      "kind": "custom",
+      "refersTo": "photo-tile",
+      "description": "Square edge-to-edge grid tile with video badge and selection states.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#c97b4a,#e8c07a)\"></div><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#4a7bc9,#9fd0e8)\"><span class=\"ds-dur\">0:12</span></div><div class=\"ds-tile ds-selected\" style=\"background:linear-gradient(135deg,#6a9a5b,#d6e8a3)\"><span class=\"ds-check\">&#10003;</span></div></div>",
+      "css": ".ds-grid { display: grid; grid-template-columns: repeat(3, 96px); gap: 2px; } .ds-tile { position: relative; width: 96px; height: 96px; background: #E6E6E6; } .ds-dur { position: absolute; right: 4px; bottom: 4px; font: 12px 'Open Sans', sans-serif; color: #fff; background: rgba(0,0,0,.5); padding: 2px 4px; } .ds-selected::after { content: ''; position: absolute; inset: 0; background: #2B4C3F; opacity: .35; } .ds-check { position: absolute; left: 6px; top: 6px; z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; background: #2B4C3F; color: #fff; font: 16px 'Open Sans', sans-serif; }"
+    },
+    {
+      "name": "Month Header",
+      "kind": "custom",
+      "description": "Group heading over each month of the timeline.",
+      "html": "<div class=\"ds-month\">October 2026</div>",
+      "css": ".ds-month { font: 600 16px 'Open Sans', sans-serif; color: #000; padding: 16px 8px 6px; }"
+    },
+    {
+      "name": "Filter Picker",
+      "kind": "input",
+      "description": "Native underline picker; the unset value names what it filters.",
+      "html": "<label class=\"ds-picker\"><select><option>Any folder</option><option>Trips</option><option>Trips / Bali</option></select></label>",
+      "css": ".ds-picker select { font: 14px 'Open Sans', sans-serif; color: #212121; background: transparent; border: none; border-bottom: 1px solid #6E6E6E; min-height: 48px; min-width: 160px; padding: 0 4px; } .ds-picker select:focus-visible { outline: none; border-bottom: 2px solid #2B4C3F; }"
+    },
+    {
+      "name": "Queue Row",
+      "kind": "custom",
+      "description": "One upload: name, progress, quiet status line; red when failed.",
+      "html": "<div class=\"ds-queue\"><div class=\"ds-q-name\">IMG_0042.jpg</div><div class=\"ds-q-bar\"><span style=\"width:62%\"></span></div><div class=\"ds-q-detail\">62% of 3.4 MB</div></div>",
+      "css": ".ds-queue { width: 300px; padding: 6px 0; font-family: 'Open Sans', sans-serif; } .ds-q-name { font-size: 14px; color: #000; } .ds-q-bar { height: 4px; background: #DCEBE3; margin: 4px 0; } .ds-q-bar span { display: block; height: 100%; background: #2B4C3F; } .ds-q-detail { font-size: 12px; opacity: .7; } .ds-queue.failed .ds-q-detail { color: #b3261e; opacity: 1; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Five-tab bottom navigation; Archive Green marks the selected tab.",
+      "html": "<nav class=\"ds-tabs\"><a>Home</a><a aria-current=\"page\">Library</a><a>Upload</a><a>Places</a><a>Family</a></nav>",
+      "css": ".ds-tabs { display: flex; background: #fff; width: 360px; } .ds-tabs a { flex: 1; text-align: center; padding: 12px 0; font: 13px 'Open Sans', sans-serif; color: #212121; cursor: pointer; } .ds-tabs a[aria-current] { color: #2B4C3F; font-weight: 600; } .ds-tabs a:hover { color: #2B4C3F; }"
+    },
+    {
+      "name": "Place Row",
+      "kind": "card",
+      "description": "A grouped location: thumbnail, coordinates, count and date span, Maps hand-off.",
+      "html": "<div class=\"ds-place\"><div class=\"ds-p-thumb\"></div><div><div class=\"ds-p-title\">1.291&#176;N, 103.852&#176;E</div><div class=\"ds-p-detail\">2 items &#183; Oct 2026</div></div><button class=\"ds-p-maps\">Maps</button></div>",
+      "css": ".ds-place { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; width: 340px; padding: 6px 0; font-family: 'Open Sans', sans-serif; } .ds-p-thumb { width: 64px; height: 64px; background: linear-gradient(135deg,#c97b4a,#e8c07a); } .ds-p-title { font-size: 16px; } .ds-p-detail { font-size: 13px; opacity: .7; } .ds-p-maps { background: transparent; color: #2B4C3F; border: 1px solid #2B4C3F; border-radius: 8px; height: 48px; padding: 0 12px; font: 14px 'Open Sans', sans-serif; cursor: pointer; } .ds-p-maps:hover { background: #DCEBE3; } .ds-p-maps:focus-visible { outline: 2px solid #8FC1A9; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Home Archive",
+    "overview": "Lore is a family's own archive, kept at home: calm, orderly and built to last, but gentle and personal rather than institutional. The interface is the shelving and the labels. The photos are the collection, and they carry nearly all of the colour on screen. Chrome stays white (or off-black at night), type is a single humanist sans, and one deep Archive Green marks what you can act on.\n\nDensity follows the task. Browsing screens are edge-to-edge photo grids with hairline 2px gutters, so the family's pictures fill the phone. Management screens (Upload, Organize, Info, Family) are plain vertical lists with comfortable padding and full-width green buttons. The system is flat. Depth comes from tonal panels and the photos themselves; the only allowed lift is a soft ambient shadow on floating sheets and dialogs.\n\nLore must never look like a cloud-photo app clone (no Google Photos or iCloud chrome and conventions copied for their own sake), never use loud multi-colour UI, and never feel like a corporate dashboard of tables and KPI tiles.",
+    "keyCharacteristics": [
+      "Photos lead; the UI recedes to white space, one sans and one green.",
+      "A single accent, Archive Green, for actions, the selected tab, checks and progress.",
+      "Edge-to-edge square photo tiles with 2px gutters, grouped under month headings.",
+      "Soft, steady controls: 8px corners and 48dp touch targets everywhere (Material minimum).",
+      "One filled action per screen; everything else outlined, text, or a chip.",
+      "Flat surfaces; tonal panels for depth; soft lift only for sheets and dialogs.",
+      "Warm, plain words in every label and message."
+    ],
+    "rules": [
+      {
+        "name": "The Photos Carry Colour Rule",
+        "body": "Chrome uses Archive Green plus neutrals and nothing else. If a screen looks colourful, it should be because of the pictures.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Green Rule",
+        "body": "Archive Green means \"you can act here\" or \"this is selected\". Don't use it as decoration, large backgrounds or text colour for body copy.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Weights Rule",
+        "body": "Hierarchy comes from size and Semibold versus Regular only. Never add a third family or a decorative face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Detail Rule",
+        "body": "Secondary information is smaller and dimmed (0.6–0.7 opacity), not coloured.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Page Rule",
+        "body": "Anything attached to the page is flat. Only things that float above the page may cast a shadow, and only softly.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep Archive Green (#2B4C3F) as the only chrome accent. Use it for actions, the selected state and progress.",
+      "**Do** let photos fill the width: square tiles, 2px gutters, no rounding, no borders.",
+      "**Do** give every tappable thing at least 48dp of height, and buttons 8px corners.",
+      "**Do** keep one filled button per screen; step everything else down to outlined, text or chip.",
+      "**Do** put filters in the chip row. Never stack pickers above a photo grid.",
+      "**Do** show placeholders in Tile Placeholder grey (#E6E6E6 / #2A2A2A) rather than leaving holes.",
+      "**Do** dim secondary text with opacity (0.6–0.7) instead of introducing new colours.",
+      "**Do** keep pages flat; use the soft sheet lift only on floating sheets and dialogs.",
+      "**Do** write labels the way the family talks: \"Waiting for home Wi-Fi\", \"Already in Lore\", \"Clear place\"."
+    ],
+    "donts": [
+      "**Don't** imitate Google Photos or iCloud chrome, icons or layouts; Lore is the family's own archive.",
+      "**Don't** add loud or multi-colour UI accents, gradients or coloured section backgrounds. The photos supply the colour.",
+      "**Don't** introduce corporate-dashboard patterns (dense tables, KPI tiles, charts) into the family app. Plain lists and counts are enough.",
+      "**Don't** use the template leftovers Magenta (#D600AA) or Midnight Blue (#190649); they are not part of Lore's palette.",
+      "**Don't** round photo tiles or add shadows to pages, rows or tiles.",
+      "**Don't** add a second typeface or use all-caps labels."
+    ]
+  }
+}

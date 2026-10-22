@@ -13,19 +13,23 @@ public sealed partial class QueueRow(int id) : ObservableObject
 	[ObservableProperty] public partial string Detail { get; set; } = "";
 	[ObservableProperty] public partial double Progress { get; set; }
 	[ObservableProperty] public partial bool IsFailed { get; set; }
+	/// <summary>Full reason, shown on its own line only when the upload failed.</summary>
+	[ObservableProperty] public partial string? ErrorText { get; set; }
 
 	public void Update(QueueItem i)
 	{
 		Name = i.FileName;
 		Progress = i.Size == 0 ? 0 : (double)i.Offset / i.Size;
 		IsFailed = i.Status == UploadStatus.Failed;
+		ErrorText = IsFailed ? i.Error : null;
+		// Short, so it fits beside the filename.
 		Detail = i.Status switch
 		{
 			UploadStatus.Done when i.WasDuplicate => "Already in Lore",
 			UploadStatus.Done => "Uploaded",
-			UploadStatus.Failed => "Failed: " + i.Error,
-			UploadStatus.Uploading => $"{Progress:P0} of {i.Size / 1048576.0:0.#} MB",
-			_ when i.Error != null => $"Waiting to retry ({i.Attempts}/{UploadEngine.MaxAttempts})",
+			UploadStatus.Failed => "Failed",
+			UploadStatus.Uploading => $"{Progress:P0} · {i.Size / 1048576.0:0.#} MB",
+			_ when i.Error != null => $"Retry {i.Attempts}/{UploadEngine.MaxAttempts}",
 			_ => "Waiting",
 		};
 	}
