@@ -14,10 +14,14 @@ tests/Lore.Api.Tests  API + upload engine tests against an in-memory server
 
 1. Copy `.env.example` to `.env` and set `LORE_ADMIN_PASSWORD`.
 2. Run `docker compose up -d --build`.
-3. Allow inbound TCP 80 in Windows Firewall. Run this in an elevated PowerShell:
-   `New-NetFirewallRule -DisplayName "Lore" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow -Profile Private`
-4. On the router, add a DNS record `lore.home.arpa` that points to the PC's static IP.
-5. Check from another device: `http://lore.home.arpa/api/health`.
+3. In an elevated PowerShell, mark the home network as Private and let LAN devices reach port 80:
+   ```powershell
+   Set-NetConnectionProfile -InterfaceAlias Ethernet -NetworkCategory Private
+   New-NetFirewallRule -DisplayName "Lore (HTTP, LAN only)" -Direction Inbound -Protocol TCP -LocalPort 80 -RemoteAddress LocalSubnet -Action Allow -Profile Private
+   ```
+4. On the router, reserve the PC's IP (DHCP reservation for its MAC address) so it never changes, and add a DNS record `lore.home.arpa` pointing to it.
+5. Keep the server reachable: in Docker Desktop turn on **Start Docker Desktop when you sign in** (the container restarts with it), and set the PC to never sleep while plugged in.
+6. Check from a phone on home Wi-Fi: `http://lore.home.arpa/api/health` (or `http://<PC IP>/api/health`).
 
 Storage layout under `G:\lore`:
 
