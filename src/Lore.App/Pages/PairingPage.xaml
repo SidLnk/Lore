@@ -7,7 +7,8 @@
 
 	<ScrollView>
 		<VerticalStackLayout Padding="24" Spacing="16">
-			<Label Text="Lore" FontSize="32" FontFamily="OpenSansSemibold" />
+			<Image Source="{AppThemeBinding Light=lore_logo.png, Dark=lore_logo_dark.png}" HeightRequest="40"
+				HorizontalOptions="Start" SemanticProperties.Description="Lore" />
 			<Label Text="On the home PC, open http://lore.home.arpa/admin and tap New pairing code. Enter it below." />
 
 			<VerticalStackLayout x:Name="PairForm" Spacing="8">

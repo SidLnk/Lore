@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 0 684 256" width="684" height="256" role="img" aria-labelledby="title">
+  <title id="title">Lore lockup A3</title>
+  <g id="symbol">
+  <path fill="#000000" d="M80 68 H176 A12 12 0 0 1 188 80 V176 A12 12 0 0 1 176 188 H80 A12 12 0 0 1 68 176 V80 A12 12 0 0 1 80 68 Z"/>
+  <path fill="#000000" d="M32 128 H56 V200 H128 V224 H44 A12 12 0 0 1 32 212 Z"/>
+  <path fill="#000000" d="M224 128 H200 V56 H128 V32 H212 A12 12 0 0 1 224 44 Z"/>
+  </g>
+  <g id="wordmark" transform="translate(280 0)">
+  <path fill="#000000" d="M14 24 A14 14 0 0 1 28 38 V186 A14 14 0 0 1 0 186 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#000000" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#000000" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#000000" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>

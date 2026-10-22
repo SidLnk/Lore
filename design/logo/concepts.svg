@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1034" viewBox="0 0 1600 1034"><defs><filter id="grey"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1600" height="1034" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">Logo concepts</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Concepts for review — pick a direction (or tell me what you like in each).</text><rect x="60" y="150" width="474.667" height="824" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="90" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c0-title">Lore, photo corners</title>
+  <path fill="#000000" d="M60 48 H151 L208 105 V196 A12 12 0 0 1 196 208 H105 L48 151 V60 A12 12 0 0 1 60 48 Z"/>
+  <path fill="#000000" d="M32 152 L104 224 H40 A8 8 0 0 1 32 216 Z"/>
+  <path fill="#000000" d="M152 32 H216 A8 8 0 0 1 224 40 V104 Z"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="8 0 684 256" x="90" y="514" width="414.667" height="170" preserveAspectRatio="xMidYMid meet">
+  <title id="l0-title">Lore lockup A</title>
+  <g id="l0-symbol">
+  <path fill="#000000" d="M60 48 H151 L208 105 V196 A12 12 0 0 1 196 208 H105 L48 151 V60 A12 12 0 0 1 60 48 Z"/>
+  <path fill="#000000" d="M32 152 L104 224 H40 A8 8 0 0 1 32 216 Z"/>
+  <path fill="#000000" d="M152 32 H216 A8 8 0 0 1 224 40 V104 Z"/>
+  </g>
+  <g id="l0-wordmark" transform="translate(280 0)">
+  <path fill="#000000" d="M14 24 A14 14 0 0 1 28 38 V186 A14 14 0 0 1 0 186 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#000000" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#000000" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#000000" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="90" y="710" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s064-title">Lore, photo corners</title>
+  <path fill="#000000" d="M60 48 H151 L208 105 V196 A12 12 0 0 1 196 208 H105 L48 151 V60 A12 12 0 0 1 60 48 Z"/>
+  <path fill="#000000" d="M32 152 L104 224 H40 A8 8 0 0 1 32 216 Z"/>
+  <path fill="#000000" d="M152 32 H216 A8 8 0 0 1 224 40 V104 Z"/>
+</svg>
+</g><text x="122" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="180" y="742" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s032-title">Lore, photo corners</title>
+  <path fill="#000000" d="M60 48 H151 L208 105 V196 A12 12 0 0 1 196 208 H105 L48 151 V60 A12 12 0 0 1 60 48 Z"/>
+  <path fill="#000000" d="M32 152 L104 224 H40 A8 8 0 0 1 32 216 Z"/>
+  <path fill="#000000" d="M152 32 H216 A8 8 0 0 1 224 40 V104 Z"/>
+</svg>
+</g><text x="196" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="238" y="758" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s016-title">Lore, photo corners</title>
+  <path fill="#000000" d="M60 48 H151 L208 105 V196 A12 12 0 0 1 196 208 H105 L48 151 V60 A12 12 0 0 1 60 48 Z"/>
+  <path fill="#000000" d="M32 152 L104 224 H40 A8 8 0 0 1 32 216 Z"/>
+  <path fill="#000000" d="M152 32 H216 A8 8 0 0 1 224 40 V104 Z"/>
+</svg>
+</g><text x="246" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="830" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · Photo corners</text><text x="90.0" y="864" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">The corners that hold a print in a family</text><text x="90.0" y="890" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">album.</text><rect x="562.667" y="150" width="474.667" height="824" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="592.667" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c1-title">Lore, keyhole L</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M96 127.71 A32 32 0 1 1 128 127.71 V152 H156 A16 16 0 0 1 156 184 H108 A12 12 0 0 1 96 172 Z"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="8 0 684 256" x="592.667" y="514" width="414.667" height="170" preserveAspectRatio="xMidYMid meet">
+  <title id="l1-title">Lore lockup B</title>
+  <g id="l1-symbol">
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M96 127.71 A32 32 0 1 1 128 127.71 V152 H156 A16 16 0 0 1 156 184 H108 A12 12 0 0 1 96 172 Z"/>
+  </g>
+  <g id="l1-wordmark" transform="translate(280 0)">
+  <path fill="#000000" d="M14 24 A14 14 0 0 1 28 38 V186 A14 14 0 0 1 0 186 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#000000" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#000000" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#000000" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="592.667" y="710" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s164-title">Lore, keyhole L</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M96 127.71 A32 32 0 1 1 128 127.71 V152 H156 A16 16 0 0 1 156 184 H108 A12 12 0 0 1 96 172 Z"/>
+</svg>
+</g><text x="624.667" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="682.667" y="742" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s132-title">Lore, keyhole L</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M96 127.71 A32 32 0 1 1 128 127.71 V152 H156 A16 16 0 0 1 156 184 H108 A12 12 0 0 1 96 172 Z"/>
+</svg>
+</g><text x="698.667" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="740.667" y="758" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s116-title">Lore, keyhole L</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M96 127.71 A32 32 0 1 1 128 127.71 V152 H156 A16 16 0 0 1 156 184 H108 A12 12 0 0 1 96 172 Z"/>
+</svg>
+</g><text x="748.667" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="592.6666666666667" y="830" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · Keyhole L</text><text x="592.6666666666667" y="858" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="592.6666666666667" y="892" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">A keyhole that turns into an L: the</text><text x="592.6666666666667" y="918" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">family&#x27;s lore, kept at home.</text><rect x="1065.33" y="150" width="474.667" height="824" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1095.33" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c2-title">Lore, bookmark l</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M128 56 A20 20 0 0 1 148 76 V204 L128 184 L108 204 V76 A20 20 0 0 1 128 56 Z"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 452 256" x="1095.33" y="514" width="414.667" height="170" preserveAspectRatio="xMidYMid meet">
+  <title id="l2-title">Lore wordmark, bookmark l</title>
+  <g transform="translate(32 0)">
+  <path fill="#000000" d="M14 24 A14 14 0 0 1 28 38 V236 L14 220 L0 236 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#000000" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#000000" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#000000" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1095.33" y="710" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s264-title">Lore, bookmark l</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M128 56 A20 20 0 0 1 148 76 V204 L128 184 L108 204 V76 A20 20 0 0 1 128 56 Z"/>
+</svg>
+</g><text x="1127.33" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1185.33" y="742" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s232-title">Lore, bookmark l</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M128 56 A20 20 0 0 1 148 76 V204 L128 184 L108 204 V76 A20 20 0 0 1 128 56 Z"/>
+</svg>
+</g><text x="1201.33" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1243.33" y="758" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s216-title">Lore, bookmark l</title>
+  <path fill="#000000" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M128 56 A20 20 0 0 1 148 76 V204 L128 184 L108 204 V76 A20 20 0 0 1 128 56 Z"/>
+</svg>
+</g><text x="1251.33" y="794" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="1095.3333333333335" y="830" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">C · Bookmark l</text><text x="1095.3333333333335" y="864" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">The l is a bookmark ribbon: keeping your</text><text x="1095.3333333333335" y="890" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">place in the family story.</text></svg>

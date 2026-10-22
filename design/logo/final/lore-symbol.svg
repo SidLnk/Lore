@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Lore</title>
+  <path fill="#2B4C3F" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M82 72 H135 L184 121 V174 A10 10 0 0 1 174 184 H121 L72 135 V82 A10 10 0 0 1 82 72 Z M60 140 L116 196 H66 A6 6 0 0 1 60 190 Z M140 60 H190 A6 6 0 0 1 196 66 V116 Z"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
+  <title id="title">Lore, photo corners A3</title>
+  <path fill="#000000" d="M80 68 H176 A12 12 0 0 1 188 80 V176 A12 12 0 0 1 176 188 H80 A12 12 0 0 1 68 176 V80 A12 12 0 0 1 80 68 Z"/>
+  <path fill="#000000" d="M32 128 H56 V200 H128 V224 H44 A12 12 0 0 1 32 212 Z"/>
+  <path fill="#000000" d="M224 128 H200 V56 H128 V32 H212 A12 12 0 0 1 224 44 Z"/>
+</svg>

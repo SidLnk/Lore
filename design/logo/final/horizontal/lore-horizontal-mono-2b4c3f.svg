@@ -1,0 +1,12 @@
+<svg fill="#2b4c3f" xmlns="http://www.w3.org/2000/svg" viewBox="8 0 684 256" role="img" aria-labelledby="title"><title>Lore</title>
+  <title id="title">Lore</title>
+  <g id="symbol">
+  <path fill="#2b4c3f" fill-rule="evenodd" d="M80 32 H176 A48 48 0 0 1 224 80 V176 A48 48 0 0 1 176 224 H80 A48 48 0 0 1 32 176 V80 A48 48 0 0 1 80 32 Z M82 72 H135 L184 121 V174 A10 10 0 0 1 174 184 H121 L72 135 V82 A10 10 0 0 1 82 72 Z M60 140 L116 196 H66 A6 6 0 0 1 60 190 Z M140 60 H190 A6 6 0 0 1 196 66 V116 Z"/>
+  </g>
+  <g id="wordmark" transform="translate(280 0)">
+  <path fill="#2b4c3f" d="M14 24 A14 14 0 0 1 28 38 V186 A14 14 0 0 1 0 186 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#2b4c3f" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#2b4c3f" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#2b4c3f" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>

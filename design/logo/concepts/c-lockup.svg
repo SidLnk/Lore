@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 452 256" width="452" height="256" role="img" aria-labelledby="title">
+  <title id="title">Lore wordmark, bookmark l</title>
+  <g transform="translate(32 0)">
+  <path fill="#000000" d="M14 24 A14 14 0 0 1 28 38 V236 L14 220 L0 236 V38 A14 14 0 0 1 14 24 Z"/>
+  <path fill="#000000" fill-rule="evenodd" d="M46 140 A60 60 0 1 0 166 140 A60 60 0 1 0 46 140 Z M74 140 A32 32 0 1 0 138 140 A32 32 0 1 0 74 140 Z"/>
+  <path fill="#000000" d="M184 80 H212 V200 H184 Z M184 140 A60 60 0 0 1 244 80 V108 A32 32 0 0 0 212 140 Z"/>
+  <path fill="#000000" d="M370.43 182.43 A60 60 0 1 1 388 140 H360 A32 32 0 1 0 350.63 162.63 Z M288 128 H388 V150 H288 Z"/>
+  </g>
+</svg>

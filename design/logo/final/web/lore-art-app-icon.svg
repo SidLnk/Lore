@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>Lore</title><rect width="256" height="256" rx="57.6" fill="#2B4C3F"/><g transform="translate(-21.38 -21.38) scale(1.167)" fill="#ffffff">
+  <title id="title">Lore</title>
+  <path fill="#ffffff" d="M82 72 H135 L184 121 V174 A10 10 0 0 1 174 184 H121 L72 135 V82 A10 10 0 0 1 82 72 Z"/>
+  <path fill="#ffffff" d="M60 140 L116 196 H66 A6 6 0 0 1 60 190 Z"/>
+  <path fill="#ffffff" d="M140 60 H190 A6 6 0 0 1 196 66 V116 Z"/>
+</g></svg>
