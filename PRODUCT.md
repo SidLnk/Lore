@@ -50,7 +50,7 @@ Lore is the family's own archive, not a cloud service:
 
 - Name: **Lore**.
 - Voice: warm, plain and family-friendly. Short sentences, no jargon. Destructive actions say exactly what happens and whether it can be undone.
-- The family members' names (Alex, Sam, Robin) appear in the UI as owners.
+- The family members' names appear in the UI as owners. Alex, Sam and Robin are placeholders: the real names live only in the server's `.env` (`LORE_FAMILY`), never in the repo.
 
 ## Evidence on Hand
 
