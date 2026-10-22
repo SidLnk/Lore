@@ -196,6 +196,8 @@ public sealed class InfoPage : ContentPage
 				_viewer.Version++;
 				await LoadAsync();
 			};
+			// Wrap to a new row rather than shrink: a shrunk button wraps its label and clips the second line.
+			FlexLayout.SetShrink(b, 0);
 			actions.Add(b);
 		}
 

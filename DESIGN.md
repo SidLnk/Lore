@@ -276,9 +276,9 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 - Actions that can't do anything (Empty bin on an empty bin) are disabled, not hidden.
 
 ### Navigation
-- Under 600dp wide: a bottom tab bar with five tabs: Home, Library, Upload, Places and Family. Icons are 24px outline glyphs at a 2px stroke.
+- Under 600dp wide: a bottom tab bar with five tabs: Home, Library, Upload, Places and Family. Icons are 24px outline glyphs at a 2px stroke. Tab and rail labels are a fixed 13dp (the same selected or not) so they never collide with their icons at large system text sizes; every other text scales with the system setting.
 - The selected tab is Archive Green (Sage Mist at night); unselected tabs are Ink Soft (Gray 200 at night). The tab bar background is white (black at night).
-- 600dp and wider (tablets, phones in landscape): the same five destinations as an 80dp navigation rail on the start edge, with the Lore symbol (32dp) at the top. Each item is the icon over a 12px label; the selected one sits in a 56 × 32dp pill (Pale Celadon; Archive Green at night) with a Semibold label. The rail's top carries the status bar's green band and widens by any cutout on its side.
+- 600dp and wider (tablets, phones in landscape): the same five destinations as an 80dp navigation rail on the start edge, with the Lore symbol (32dp) at the top. Each item is the icon over a 13dp label; the selected one sits in a 56 × 32dp pill (Pale Celadon; Archive Green at night) with a Semibold label. The rail's top carries the status bar's green band and widens by any cutout on its side.
 - The viewer and video player are fullscreen at every size: they hide the rail as they hide the tabs.
 - The nav bar is white or off-black, flat and title-left, with text toolbar actions on the right.
 

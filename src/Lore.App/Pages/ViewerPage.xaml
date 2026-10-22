@@ -6,6 +6,16 @@
 	BackgroundColor="Black"
 	Shell.TabBarIsVisible="False">
 
+	<!-- Two lines rather than "date · owner": at large text sizes one line truncated the owner away. -->
+	<Shell.TitleView>
+		<VerticalStackLayout VerticalOptions="Center" Spacing="0" SemanticProperties.HeadingLevel="Level1">
+			<Label x:Name="When" FontFamily="OpenSansSemibold" FontSize="16" LineBreakMode="TailTruncation"
+				TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource SecondaryDarkText}}" />
+			<Label x:Name="Who" FontSize="13" Opacity="0.7" LineBreakMode="TailTruncation"
+				TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource SecondaryDarkText}}" />
+		</VerticalStackLayout>
+	</Shell.TitleView>
+
 	<!-- One Image + swipe instead of CarouselView: CarouselView mis-sized items when opened at a position. -->
 	<Grid>
 		<Grid.GestureRecognizers>

@@ -58,6 +58,9 @@ public partial class ViewerPage : ContentPage
 		SetIcon(_favorite, item.Favorite ? "icon_heart_filled" : "icon_heart");
 		var owner = _session.MemberName(item.Dto.OwnerId);
 		Title = $"{item.Dto.DateTaken:d MMM yyyy, HH:mm}{(owner == null ? "" : " · " + owner)}";
+		When.Text = $"{item.Dto.DateTaken:d MMM yyyy, HH:mm}";
+		Who.Text = owner;
+		Who.IsVisible = owner != null;
 	}
 
 	async void OnFavorite(object? sender, EventArgs e)

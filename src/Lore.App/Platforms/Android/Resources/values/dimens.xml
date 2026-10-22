@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bottom tab labels at a fixed 13dp: in sp they grow into the icons at large system text sizes (2.0x).
+         The icons carry each tab, and selected and unselected stay the same size. -->
+    <dimen name="design_bottom_navigation_text_size">13dp</dimen>
+    <dimen name="design_bottom_navigation_active_text_size">13dp</dimen>
+</resources>

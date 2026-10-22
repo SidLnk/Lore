@@ -28,7 +28,8 @@
 					</Border.Triggers>
 					<Image Source="{Binding Icon}" WidthRequest="24" HeightRequest="24" />
 				</Border>
-				<Label Text="{Binding Title}" FontSize="12" HorizontalTextAlignment="Center">
+				<!-- Fixed size like the bottom tab labels (Platforms/Android/Resources/values/dimens.xml). -->
+				<Label Text="{Binding Title}" FontSize="13" FontAutoScalingEnabled="False" HorizontalTextAlignment="Center">
 					<Label.Triggers>
 						<DataTrigger TargetType="Label" Binding="{Binding IsChecked}" Value="True">
 							<Setter Property="FontFamily" Value="OpenSansSemibold" />
