@@ -16,7 +16,9 @@ var volumes = config.GetSection("Storage:Volumes").GetChildren()
 if (volumes.Count == 0) throw new InvalidOperationException("Configure at least one Storage:Volumes entry");
 
 var db = new Db(config["Lore:DbPath"]!);
-db.Migrate(volumes.Select(v => (v.Id, v.Name)));
+var family = (config["Lore:Family"] ?? "").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+if (family.Length == 0) throw new InvalidOperationException("Set Lore:Family to the family members' names, comma separated");
+db.Migrate(volumes.Select(v => (v.Id, v.Name)), family);
 var paths = new LorePaths(config["Lore:DataRoot"]!);
 
 builder.Services.AddSingleton(db);

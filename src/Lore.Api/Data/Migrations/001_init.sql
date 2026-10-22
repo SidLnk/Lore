@@ -2,7 +2,7 @@ CREATE TABLE FamilyMember(
     Id   INTEGER PRIMARY KEY,
     Name TEXT NOT NULL UNIQUE
 );
-INSERT INTO FamilyMember(Id, Name) VALUES (1, 'Alex'), (2, 'Sam'), (3, 'Robin');
+-- Members are seeded from the Lore:Family setting on first start (Db.Migrate), so names stay out of the code.
 
 CREATE TABLE Device(
     Id             TEXT PRIMARY KEY,

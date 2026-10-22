@@ -44,7 +44,7 @@ public sealed class Db
         return c;
     }
 
-    public void Migrate(IEnumerable<(string Id, string Name)> volumes)
+    public void Migrate(IEnumerable<(string Id, string Name)> volumes, IReadOnlyList<string> family)
     {
         using var c = Open();
         c.Execute("PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS SchemaVersion(Version INTEGER NOT NULL)");
@@ -67,6 +67,11 @@ public sealed class Db
 
         foreach (var v in volumes)
             c.Execute("INSERT OR IGNORE INTO StorageVolume(Id, Name) VALUES (@Id, @Name)", new { v.Id, v.Name });
+
+        // First start only: later edits to the setting never rename or drop members that own media.
+        if (!c.ExecuteScalar<bool>("SELECT EXISTS(SELECT 1 FROM FamilyMember)"))
+            for (var i = 0; i < family.Count; i++)
+                c.Execute("INSERT INTO FamilyMember(Id, Name) VALUES (@Id, @Name)", new { Id = i + 1, Name = family[i] });
     }
 
     sealed class GuidHandler : SqlMapper.TypeHandler<Guid>

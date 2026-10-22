@@ -12,6 +12,8 @@ services:
       - lore-db:/db
     environment:
       Lore__AdminPassword: ${LORE_ADMIN_PASSWORD:?Set LORE_ADMIN_PASSWORD in .env}
+      # Seeded into an empty database only, in this order (ids 1, 2, 3...).
+      Lore__Family: ${LORE_FAMILY:?Set LORE_FAMILY in .env}
       TZ: ${TZ:-Asia/Singapore}
     restart: unless-stopped
 
