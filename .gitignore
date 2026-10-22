@@ -4,3 +4,4 @@ obj/
 .env
 *.user
 .vs/
+.impeccable/hook.cache.json
