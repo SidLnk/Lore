@@ -22,6 +22,7 @@ public static class MauiProgram
 
 		builder.Services.AddSingleton<Session>();
 		builder.Services.AddSingleton<Uploads>();
+		builder.Services.AddSingleton<Saves>();
 		builder.Services.AddSingleton<ViewerState>();
 		builder.Services.AddSingleton<Organizer>();
 		builder.Services.AddTransient<OrganizePage>();

@@ -11,7 +11,7 @@ public partial class ViewerPage : ContentPage
 	readonly ToolbarItem _favorite = new();
 	readonly ToolbarItem _remove = new();
 
-	public ViewerPage(ViewerState state, Session session)
+	public ViewerPage(ViewerState state, Session session, Organizer organizer)
 	{
 		InitializeComponent();
 		_state = state;
@@ -29,6 +29,15 @@ public partial class ViewerPage : ContentPage
 			ToolbarItems.Add(info);
 		}
 		ToolbarItems.Add(_remove);
+		if (!state.FromBin)
+		{
+			// Overflow menu: a fourth icon would squeeze the two-line title at large text sizes.
+			ToolbarItems.Add(new ToolbarItem
+			{
+				Text = "Save to phone", Order = ToolbarItemOrder.Secondary,
+				Command = new Command(async () => { if (Current is { } item) await organizer.SaveToPhoneAsync([item.Dto]); }),
+			});
+		}
 		Show();
 	}
 

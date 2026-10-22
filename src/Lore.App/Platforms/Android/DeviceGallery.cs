@@ -3,8 +3,12 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Provider;
+using System.Globalization;
+using System.Security.Cryptography;
+using Lore.Contracts;
 using Microsoft.Win32.SafeHandles;
 using Uri = Android.Net.Uri;
+using Path = System.IO.Path;
 
 namespace Lore.App.Droid;
 
@@ -28,6 +32,8 @@ public static class DeviceGallery
 			.. OperatingSystem.IsAndroidVersionAtLeast(33)
 				? new[] { (Manifest.Permission.ReadMediaImages, true), (Manifest.Permission.ReadMediaVideo, true) }
 				: [(Manifest.Permission.ReadExternalStorage, true)],
+			// Android 8-9 only: Save to phone writes into the shared Pictures/Movies folders.
+			.. OperatingSystem.IsAndroidVersionAtLeast(29) ? Array.Empty<(string, bool)>() : [(Manifest.Permission.WriteExternalStorage, true)],
 			.. OperatingSystem.IsAndroidVersionAtLeast(29) ? [(Manifest.Permission.AccessMediaLocation, true)] : Array.Empty<(string, bool)>(),
 		];
 	}
@@ -58,6 +64,108 @@ public static class DeviceGallery
 			result.Add(new DeviceMedia(c.GetLong(0), c.GetString(1) ?? $"media_{c.GetLong(0)}", c.GetString(2) ?? "", c.GetLong(3), taken, c.GetInt(5) == 3));
 		}
 		return result;
+	}
+
+	/// <summary>
+	/// Content URI of a gallery photo or video with exactly these bytes, or null.
+	/// Size narrows the candidates (usually to none); SHA-256 confirms.
+	/// </summary>
+	public static string? FindOriginal(long size, string sha256)
+	{
+		string[] projection = [IBaseColumns.Id, MediaStore.Files.IFileColumns.MediaType];
+		var args = new Bundle();
+		args.PutString(ContentResolver.QueryArgSqlSelection, $"{MediaStore.IMediaColumns.Size} = ? AND {MediaStore.Files.IFileColumns.MediaType} IN (1, 3)");
+		args.PutStringArray(ContentResolver.QueryArgSqlSelectionArgs, [size.ToString(CultureInfo.InvariantCulture)]);
+		using var c = Resolver.Query(MediaStore.Files.GetContentUri("external")!, projection, args, null);
+		if (c == null) return null;
+		while (c.MoveToNext())
+		{
+			var collection = c.GetInt(1) == 3 ? MediaStore.Video.Media.ExternalContentUri! : MediaStore.Images.Media.ExternalContentUri!;
+			var uri = ContentUris.WithAppendedId(collection, c.GetLong(0)).ToString()!;
+			try
+			{
+				using var s = OpenOriginal(uri);
+				if (Convert.ToHexString(SHA256.HashData(s)).Equals(sha256, StringComparison.OrdinalIgnoreCase)) return uri;
+			}
+			catch (Exception e) when (e is IOException or Java.Lang.Exception)
+			{
+				// Unreadable (gone, or another app's file without permission): not a match.
+			}
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Writes a Lore original into the gallery under Pictures/Lore or Movies/Lore, checking its SHA-256 on the way.
+	/// Nothing is left behind if the download fails or doesn't match.
+	/// </summary>
+	public static async Task SaveAsync(MediaDto m, Stream source, CancellationToken ct)
+	{
+		var video = m.MediaType == MediaTypes.Video;
+		var folder = Path.Combine(video ? Android.OS.Environment.DirectoryMovies! : Android.OS.Environment.DirectoryPictures!, "Lore");
+		if (OperatingSystem.IsAndroidVersionAtLeast(29))
+		{
+			var values = new ContentValues();
+			values.Put(MediaStore.IMediaColumns.DisplayName, m.OriginalFilename);
+			values.Put(MediaStore.IMediaColumns.MimeType, m.MimeType);
+			values.Put(MediaStore.IMediaColumns.RelativePath, folder);
+			// DateTaken is wall-clock time where it was taken; the phone's zone is the family's zone.
+			values.Put(MediaStore.IMediaColumns.DateTaken, new DateTimeOffset(m.DateTaken, TimeZoneInfo.Local.GetUtcOffset(m.DateTaken)).ToUnixTimeMilliseconds());
+			values.Put(MediaStore.IMediaColumns.IsPending, 1);
+			var collection = video
+				? MediaStore.Video.Media.GetContentUri(MediaStore.VolumeExternalPrimary)!
+				: MediaStore.Images.Media.GetContentUri(MediaStore.VolumeExternalPrimary)!;
+			var uri = Resolver.Insert(collection, values) ?? throw new IOException("The phone's gallery refused the file");
+			try
+			{
+				await using (var output = Resolver.OpenOutputStream(uri, "w") ?? throw new IOException("Couldn't write to the gallery"))
+					await CopyVerifiedAsync(source, output, m.Sha256, ct);
+				var done = new ContentValues();
+				done.Put(MediaStore.IMediaColumns.IsPending, 0);
+				// shortcut: publishing rescans the file and MediaProvider takes DATE_TAKEN from the file's own EXIF/metadata,
+				// ignoring ours (re-applying it after publish doesn't stick either). Camera photos and videos carry a date;
+				// files without one (screenshots, some edits) sort as "saved today" in the gallery. Fix would be writing EXIF.
+				Resolver.Update(uri, done, null, null);
+			}
+			catch
+			{
+				Resolver.Delete(uri, null, null);
+				throw;
+			}
+			return;
+		}
+
+		// Android 8-9: a plain file in the shared folder, then ask the media scanner to index it.
+		var dir = Directory.CreateDirectory(Path.Combine(Android.OS.Environment.ExternalStorageDirectory!.AbsolutePath, folder)).FullName;
+		var path = Path.Combine(dir, m.OriginalFilename);
+		for (var n = 1; File.Exists(path); n++)
+			path = Path.Combine(dir, $"{Path.GetFileNameWithoutExtension(m.OriginalFilename)} ({n}){Path.GetExtension(m.OriginalFilename)}");
+		try
+		{
+			await using (var output = File.Create(path))
+				await CopyVerifiedAsync(source, output, m.Sha256, ct);
+		}
+		catch
+		{
+			File.Delete(path);
+			throw;
+		}
+		File.SetLastWriteTime(path, m.DateTaken);
+		Android.Media.MediaScannerConnection.ScanFile(Platform.AppContext, [path], [m.MimeType], null);
+	}
+
+	static async Task CopyVerifiedAsync(Stream source, Stream output, string sha256, CancellationToken ct)
+	{
+		using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+		var buffer = new byte[81920];
+		int n;
+		while ((n = await source.ReadAsync(buffer, ct)) > 0)
+		{
+			hash.AppendData(buffer, 0, n);
+			await output.WriteAsync(buffer.AsMemory(0, n), ct);
+		}
+		if (!Convert.ToHexString(hash.GetHashAndReset()).Equals(sha256, StringComparison.OrdinalIgnoreCase))
+			throw new IOException("The download didn't match the original");
 	}
 
 	/// <summary>Seekable stream over the original file (location intact when permission allows), for resumable uploads.</summary>

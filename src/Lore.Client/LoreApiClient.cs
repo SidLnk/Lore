@@ -133,6 +133,14 @@ public sealed class LoreApiClient(HttpClient http)
     public Task<List<PlaceDto>> GetPlacesAsync(double cellDegrees, CancellationToken ct = default) =>
         SendAsync<List<PlaceDto>>(HttpMethod.Get, FormattableString.Invariant($"api/places?cell={cellDegrees}"), null, ct);
 
+    /// <summary>The original's bytes as a stream (not buffered: videos can be large). Dispose it to free the connection.</summary>
+    public async Task<Stream> OpenOriginalAsync(Guid id, CancellationToken ct = default)
+    {
+        var res = await http.GetAsync($"api/media/{id}/original", HttpCompletionOption.ResponseHeadersRead, ct);
+        if (res.IsSuccessStatusCode) return await res.Content.ReadAsStreamAsync(ct);
+        using (res) throw await ErrorAsync(res, ct);
+    }
+
     // Image and video controls can't send headers, so media URLs carry the token.
     public Uri ThumbUrl(Guid id) => MediaUrl(id, "thumb");
     public Uri PreviewUrl(Guid id) => MediaUrl(id, "preview");

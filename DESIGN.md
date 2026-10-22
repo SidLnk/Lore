@@ -255,6 +255,13 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 - **Filter pickers** always show what they filter, even when unset: "Any folder", "Any album", "Any tag", "Any device", "Any location". Never use a bare "Any".
 - **Check boxes:** Archive Green (white in the dark theme).
 
+### Save to Phone
+- Offered in three places: the viewer's overflow menu, first in the selection **Edit (n)** sheet, and first among the Info page's outlined actions.
+- Tapping it shows a toast: "Saving 3 items to your phone. Find them in Pictures/Lore and Movies/Lore." The work runs in the background service after any uploads.
+- Progress notification "Saving to phone", with "{file name} · 2 of 5" or "Waiting for home Wi-Fi…".
+- On finish, a dismissable summary that stays: "Saved 3 items to Pictures/Lore or Movies/Lore · 2 already on this phone · 1 failed (try again on home Wi-Fi)". Only the parts that apply appear.
+- An exact copy already on the phone (same size, then same SHA-256) is never downloaded again.
+
 ### Queue Row
 - **Line 1:** the filename (middle-truncated), with a short status on the right in Quiet style ("Uploaded", "Already in Lore", "62% · 3.4 MB", "Retry 2/5").
 - **Line 2:** a full-width Archive Green progress bar.
@@ -267,7 +274,7 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 
 ### Icons
 - 24px outline glyphs at a 2px stroke with round caps and joins, drawn as SVG (tab bar, viewer toolbar) or as MAUI paths (play, check, chevron, close).
-- Viewer toolbar: heart (outline, or filled when a favorite), info and trash (restore inside the bin). Each icon has a text name for screen readers and the overflow menu.
+- Viewer toolbar: heart (outline, or filled when a favorite), info and trash (restore inside the bin). Each icon has a text name for screen readers and the overflow menu. **Save to phone** lives in the overflow menu (not shown in the bin): a fourth icon would squeeze the two-line title at large text sizes.
 - Android doesn't tint toolbar icons, so each ships a light-bar variant (black) and a dark-bar variant (Sage Text #6FA88C), switched by theme.
 - No text glyphs (✓ ▶ ♡) as icons.
 

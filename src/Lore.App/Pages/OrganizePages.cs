@@ -202,12 +202,12 @@ public sealed class InfoPage : ContentPage
 		save.Clicked += async (_, _) => await SaveCaptionAsync();
 
 		var actions = new FlexLayout { Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap };
-		foreach (var action in new[] { "Add to album", "Remove from album", "Add tags", "Remove tags", "Move to folder", "Set owner" })
+		foreach (var action in new[] { "Save to phone", "Add to album", "Remove from album", "Add tags", "Remove tags", "Move to folder", "Set owner" })
 		{
 			var b = new Button { Text = action, Style = (Style)Application.Current!.Resources["SecondaryButton"], Margin = new Thickness(0, 0, 8, 8) };
 			b.Clicked += async (_, _) =>
 			{
-				if (!await _organizer.EditAsync(this, [_item.Dto.Id], action)) return;
+				if (!await _organizer.EditAsync(this, [_item.Dto], action)) return;
 				_viewer.Version++;
 				await LoadAsync();
 			};

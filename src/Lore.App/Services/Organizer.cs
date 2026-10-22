@@ -1,3 +1,5 @@
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using Lore.Client;
 using Lore.Contracts;
 
@@ -7,18 +9,24 @@ namespace Lore.App.Services;
 /// The "edit these items" flow shared by bulk selection and the info page:
 /// an action sheet, then a picker or prompt, then one bulk API call.
 /// </summary>
-public sealed class Organizer(Session session)
+public sealed class Organizer(Session session, Saves saves)
 {
 	const string Cancel = "Cancel", NewItem = "+ New…", NoFolder = "(No folder)";
 
 	public static readonly string[] Actions =
-		["Add to album", "Remove from album", "Add tags", "Remove tags", "Move to folder", "Set owner", "Favorite", "Not favorite", "Move to recycle bin"];
+		["Save to phone", "Add to album", "Remove from album", "Add tags", "Remove tags", "Move to folder", "Set owner", "Favorite", "Not favorite", "Move to recycle bin"];
 
 	/// <returns>True when something changed on the server.</returns>
-	public async Task<bool> EditAsync(Page page, IReadOnlyList<Guid> ids, string? action = null)
+	public async Task<bool> EditAsync(Page page, IReadOnlyList<MediaDto> items, string? action = null)
 	{
-		if (ids.Count == 0 || session.Api is not { } api) return false;
+		if (items.Count == 0 || session.Api is not { } api) return false;
+		var ids = items.Select(i => i.Id).ToList();
 		action ??= await page.DisplayActionSheetAsync($"{ids.Count} selected", Cancel, null, Actions);
+		if (action == "Save to phone")
+		{
+			await SaveToPhoneAsync(items);
+			return false; // nothing changed on the server
+		}
 		try
 		{
 			BulkEditRequest? request = action switch
@@ -45,6 +53,13 @@ public sealed class Organizer(Session session)
 				? le.Message : "Couldn't reach Lore. Are you on home Wi-Fi?", "OK");
 			return false;
 		}
+	}
+
+	/// <summary>Queues originals for download into the phone's gallery; the background service reports the outcome.</summary>
+	public async Task SaveToPhoneAsync(IReadOnlyList<MediaDto> items)
+	{
+		await saves.EnqueueAsync(items);
+		await Toast.Make($"Saving {Format.Plural(items.Count, "item")} to your phone. Find them in Pictures/Lore and Movies/Lore.", ToastDuration.Long).Show();
 	}
 
 	public static async Task<List<string>?> PromptTagsAsync(Page page, string title)

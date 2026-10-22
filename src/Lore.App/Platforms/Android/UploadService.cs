@@ -11,14 +11,15 @@ using Lore.Client;
 namespace Lore.App.Droid;
 
 /// <summary>
-/// Foreground service that drains the upload queue, so uploads continue with the app in the background or the screen off.
-/// Stops itself when the queue is empty.
+/// Foreground service that drains the upload queue, then any Save to phone downloads, so both continue with the app
+/// in the background or the screen off. Stops itself when there is nothing left to do.
 /// </summary>
 [Service(Exported = false, ForegroundServiceType = ForegroundService.TypeDataSync)]
 public sealed class UploadService : Service
 {
 	const string Channel = "uploads";
-	const int NotificationId = 1;
+	const int NotificationId = 1, SummaryId = 2;
+	const string UploadTitle = "Uploading to Lore", SaveTitle = "Saving to phone";
 
 	static int _running;
 	CancellationTokenSource? _cts;
@@ -38,7 +39,7 @@ public sealed class UploadService : Service
 	public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
 	{
 		EnsureChannel();
-		var notification = Build("Preparing uploads…", 0, 0);
+		var notification = Build("Lore", "Starting…", 0, 0);
 		if (OperatingSystem.IsAndroidVersionAtLeast(29)) StartForeground(NotificationId, notification, ForegroundService.TypeDataSync);
 		else StartForeground(NotificationId, notification);
 
@@ -55,14 +56,23 @@ public sealed class UploadService : Service
 	{
 		try
 		{
-			var uploads = IPlatformApplication.Current!.Services.GetRequiredService<Uploads>();
+			var services = IPlatformApplication.Current!.Services;
+			var uploads = services.GetRequiredService<Uploads>();
+			var saves = services.GetRequiredService<Saves>();
 			var engine = uploads.CreateEngine();
 			engine.ItemChanged += Notify;
 			do
 			{
-				if (!Uploads.OnLan) Update(Build("Waiting for home Wi-Fi…", 0, 0));
-				await engine.RunAsync(ct);
-			} while (!ct.IsCancellationRequested && await uploads.Queue.NextAsync() != null);
+				if (await uploads.Queue.NextAsync() != null)
+				{
+					if (!Uploads.OnLan) Update(Build(UploadTitle, "Waiting for home Wi-Fi…", 0, 0));
+					await engine.RunAsync(ct);
+				}
+				var summary = await saves.DrainAsync((name, done, total) => Update(name == null
+					? Build(SaveTitle, "Waiting for home Wi-Fi…", 0, 0)
+					: Build(SaveTitle, $"{name} · {done + 1} of {total}", total, done)), ct);
+				if (!string.IsNullOrEmpty(summary)) ShowSummary(summary);
+			} while (!ct.IsCancellationRequested && (await uploads.Queue.NextAsync() != null || saves.HasWork));
 		}
 		catch (System.OperationCanceledException) { }
 		catch (Exception e)
@@ -88,12 +98,12 @@ public sealed class UploadService : Service
 			UploadStatus.Pending when item.Error != null => $"Retrying {item.FileName}…",
 			_ => item.FileName,
 		};
-		Update(Build(text, 100, pct));
+		Update(Build(UploadTitle, text, 100, pct));
 	}
 
-	Notification Build(string text, int max, int progress) =>
+	Notification Build(string title, string text, int max, int progress) =>
 		new NotificationCompat.Builder(this, Channel)
-			.SetContentTitle("Uploading to Lore")!
+			.SetContentTitle(title)!
 			.SetContentText(text)!
 			.SetSmallIcon(Resource.Mipmap.appicon)!
 			.SetOngoing(true)!
@@ -103,11 +113,21 @@ public sealed class UploadService : Service
 
 	void Update(Notification n) => NotificationManagerCompat.From(this)!.Notify(NotificationId, n);
 
+	/// <summary>Stays after the service stops, so the family can see what a save did.</summary>
+	void ShowSummary(string text) => NotificationManagerCompat.From(this)!.Notify(SummaryId,
+		new NotificationCompat.Builder(this, Channel)
+			.SetContentTitle(SaveTitle)!
+			.SetContentText(text)!
+			.SetStyle(new NotificationCompat.BigTextStyle().BigText(text))!
+			.SetSmallIcon(Resource.Mipmap.appicon)!
+			.SetAutoCancel(true)!
+			.Build()!);
+
 	void EnsureChannel()
 	{
 		if (!OperatingSystem.IsAndroidVersionAtLeast(26)) return;
 		var nm = (NotificationManager)GetSystemService(NotificationService)!;
-		nm.CreateNotificationChannel(new NotificationChannel(Channel, "Uploads", NotificationImportance.Low));
+		nm.CreateNotificationChannel(new NotificationChannel(Channel, "Uploads and saves", NotificationImportance.Low));
 	}
 
 	void AcquireLocks()

@@ -408,8 +408,8 @@ public partial class LibraryViewModel : ObservableObject
 
 	public async Task EditSelectedAsync(Page page)
 	{
-		var ids = Groups.SelectMany(g => g).Where(i => i.IsSelected).Select(i => i.Dto.Id).ToList();
-		if (!await _organizer.EditAsync(page, ids)) return;
+		var items = Groups.SelectMany(g => g).Where(i => i.IsSelected).Select(i => i.Dto).ToList();
+		if (!await _organizer.EditAsync(page, items)) return;
 		_viewer.Version++;
 		StopSelecting();
 		await ReloadAsync();

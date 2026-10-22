@@ -157,6 +157,14 @@ public sealed class ApiTests : IDisposable
         var res = await _f.CreateClient().SendAsync(req);
         Assert.Equal(HttpStatusCode.PartialContent, res.StatusCode);
         Assert.Equal(data[100..200], await res.Content.ReadAsByteArrayAsync());
+
+        // Save to phone streams the whole original with the bearer token.
+        await using var stream = await api.OpenOriginalAsync(id);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        Assert.Equal(data, ms.ToArray());
+        var missing = await Assert.ThrowsAsync<LoreApiException>(() => api.OpenOriginalAsync(Guid.NewGuid()));
+        Assert.Equal(HttpStatusCode.NotFound, missing.Status);
     }
 
     [Fact]
