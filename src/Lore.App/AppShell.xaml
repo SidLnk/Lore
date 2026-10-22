@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+	x:Class="Lore.App.AppShell"
+	xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	xmlns:pages="clr-namespace:Lore.App.Pages"
+	Shell.FlyoutBehavior="Disabled"
+	Title="Lore">
+
+	<TabBar>
+		<ShellContent Title="Home" Icon="tab_home.png" ContentTemplate="{DataTemplate pages:HomePage}" Route="home" />
+		<ShellContent Title="Library" Icon="tab_library.png" ContentTemplate="{DataTemplate pages:LibraryPage}" Route="library" />
+		<ShellContent Title="Upload" Icon="tab_upload.png" ContentTemplate="{DataTemplate pages:UploadPage}" Route="upload" />
+		<ShellContent Title="Places" Icon="tab_map.png" ContentTemplate="{DataTemplate pages:PlacesPage}" Route="places" />
+		<ShellContent Title="Family" Icon="tab_family.png" ContentTemplate="{DataTemplate pages:FamilyPage}" Route="family" />
+	</TabBar>
+
+</Shell>

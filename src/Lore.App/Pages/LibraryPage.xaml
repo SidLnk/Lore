@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+	x:Class="Lore.App.Pages.LibraryPage"
+	xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	xmlns:pages="clr-namespace:Lore.App.Pages"
+	xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+	x:Name="Root"
+	x:DataType="pages:LibraryViewModel"
+	Title="Library">
+
+	<ContentPage.Resources>
+		<toolkit:IsNotNullConverter x:Key="IsNotNull" />
+	</ContentPage.Resources>
+
+	<Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+		<Grid ColumnDefinitions="*,*" ColumnSpacing="8" Padding="8,4" IsVisible="{Binding ShowFilters}">
+			<Picker ItemsSource="{Binding Owners}" SelectedItem="{Binding SelectedOwner}" Title="Owner" />
+			<Picker Grid.Column="1" ItemsSource="{Binding Types}" SelectedIndex="{Binding TypeIndex}" Title="Type" />
+		</Grid>
+		<FlexLayout Grid.Row="1" Wrap="Wrap" AlignItems="Center" Padding="8,0" IsVisible="{Binding ShowFilters}">
+			<CheckBox IsChecked="{Binding UseDateRange}" VerticalOptions="Center" />
+			<Label Text="Dates" VerticalOptions="Center" />
+			<DatePicker Date="{Binding FromDate}" IsEnabled="{Binding UseDateRange}" />
+			<Label Text="to" VerticalOptions="Center" Margin="4,0" />
+			<DatePicker Date="{Binding ToDate}" IsEnabled="{Binding UseDateRange}" />
+			<CheckBox IsChecked="{Binding FavoritesOnly}" VerticalOptions="Center" />
+			<Label Text="Favorites" VerticalOptions="Center" />
+			<Button Text="More filters" Command="{Binding ToggleMoreFiltersCommand}" Margin="8,0,0,0" Padding="12,0" HeightRequest="40" />
+		</FlexLayout>
+		<Grid Grid.Row="2" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" Padding="8,0"
+			IsVisible="{Binding ShowMoreFilters}">
+			<Picker ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder}" Title="Folder" />
+			<Picker Grid.Column="1" ItemsSource="{Binding Albums}" SelectedItem="{Binding SelectedAlbum}" Title="Album" />
+			<Picker Grid.Row="1" ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" Title="Tag" />
+			<Picker Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}" Title="Device" />
+			<Picker Grid.Row="2" ItemsSource="{Binding GpsOptions}" SelectedItem="{Binding SelectedGps}" Title="Location" />
+		</Grid>
+
+		<Grid Grid.Row="3" ColumnDefinitions="*,Auto" Padding="8,4" IsVisible="{Binding Area, Converter={StaticResource IsNotNull}}">
+			<Label Text="{Binding AreaLabel}" VerticalOptions="Center" FontFamily="OpenSansSemibold" />
+			<Button Grid.Column="1" Text="Clear place" Command="{Binding ClearAreaCommand}" Padding="12,0" HeightRequest="40" />
+		</Grid>
+
+		<RefreshView Grid.Row="4" IsRefreshing="{Binding IsRefreshing}" Command="{Binding ReloadCommand}">
+			<CollectionView
+				ItemsSource="{Binding Groups}"
+				IsGrouped="True"
+				RemainingItemsThreshold="30"
+				RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
+				EmptyView="{Binding Message}">
+				<CollectionView.ItemsLayout>
+					<GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="2" VerticalItemSpacing="2" />
+				</CollectionView.ItemsLayout>
+				<CollectionView.GroupHeaderTemplate>
+					<DataTemplate x:DataType="pages:MonthGroup">
+						<Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="16" Padding="8,16,8,6" />
+					</DataTemplate>
+				</CollectionView.GroupHeaderTemplate>
+				<CollectionView.ItemTemplate>
+					<DataTemplate x:DataType="pages:MediaItem">
+						<Grid
+							HeightRequest="{Binding Vm.TileSize, Source={x:Reference Root}, x:DataType=pages:LibraryPage}"
+							BackgroundColor="{AppThemeBinding Light=#E6E6E6, Dark=#2A2A2A}">
+							<Grid.GestureRecognizers>
+								<TapGestureRecognizer
+									Command="{Binding Vm.OpenCommand, Source={x:Reference Root}, x:DataType=pages:LibraryPage}"
+									CommandParameter="{Binding .}" />
+							</Grid.GestureRecognizers>
+							<Image Source="{Binding ThumbUrl}" Aspect="AspectFill" />
+							<Label
+								Text="{Binding DurationText}" IsVisible="{Binding IsVideo}"
+								TextColor="White" FontSize="12" Padding="4,2" Margin="4"
+								BackgroundColor="#80000000" HorizontalOptions="End" VerticalOptions="End" />
+							<BoxView Color="{StaticResource Primary}" Opacity="0.35" IsVisible="{Binding IsSelected}" />
+							<Label
+								Text="✓" IsVisible="{Binding IsSelected}"
+								TextColor="White" BackgroundColor="{StaticResource Primary}" FontSize="16"
+								WidthRequest="28" HeightRequest="28" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+								Margin="6" HorizontalOptions="Start" VerticalOptions="Start" />
+						</Grid>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+		</RefreshView>
+	</Grid>
+</ContentPage>

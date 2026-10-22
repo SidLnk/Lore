@@ -1,0 +1,19 @@
+services:
+  lore:
+    build: .
+    image: lore-api
+    container_name: lore
+    ports:
+      - "80:8080"
+    volumes:
+      # Media, derived thumbnails, upload temp files and DB snapshots live on the host HDD.
+      - ${LORE_DATA:-G:/lore}:/data
+      # Live SQLite DB stays on a Docker volume: SQLite locking is unreliable over Windows bind mounts.
+      - lore-db:/db
+    environment:
+      Lore__AdminPassword: ${LORE_ADMIN_PASSWORD:?Set LORE_ADMIN_PASSWORD in .env}
+      TZ: ${TZ:-Asia/Singapore}
+    restart: unless-stopped
+
+volumes:
+  lore-db:

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+	x:Class="Lore.App.Pages.ViewerPage"
+	xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	BackgroundColor="Black"
+	Shell.TabBarIsVisible="False">
+
+	<!-- One Image + swipe instead of CarouselView: CarouselView mis-sized items when opened at a position. -->
+	<Grid>
+		<Grid.GestureRecognizers>
+			<SwipeGestureRecognizer Direction="Left" Swiped="OnNext" />
+			<SwipeGestureRecognizer Direction="Right" Swiped="OnPrevious" />
+		</Grid.GestureRecognizers>
+		<Image x:Name="Photo" Aspect="AspectFit" />
+		<ImageButton
+			x:Name="PlayButton" Source="play.png"
+			WidthRequest="88" HeightRequest="88" BackgroundColor="Transparent"
+			HorizontalOptions="Center" VerticalOptions="Center"
+			Clicked="OnPlay"
+			SemanticProperties.Description="Play video" />
+	</Grid>
+</ContentPage>

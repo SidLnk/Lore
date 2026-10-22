@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- V1 is LAN-only over plain HTTP. Cleartext is allowed globally because a domain rule can't cover a server entered by IP.
+     Replace with HTTPS + a local CA before any internet exposure. -->
+<network-security-config>
+	<base-config cleartextTrafficPermitted="true" />
+</network-security-config>

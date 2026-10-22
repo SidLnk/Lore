@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lore admin</title>
+<style>
+  :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+  body { max-width: 640px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 2.5rem; margin: .5rem 0 1rem; }
+  h2 { font-size: 1.375rem; margin: 2rem 0 .5rem; }
+  .code { font-size: 3rem; font-weight: 700; letter-spacing: .3em; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid #8884; }
+  button { font: inherit; padding: 8px 14px; }
+  .muted { opacity: .7; }
+</style>
+</head>
+<body>
+<h1>Lore</h1>
+
+<section>
+  <h2>Pair a phone</h2>
+  <p class="muted">Open Lore on the phone, enter the server address, then type this code. Codes expire in 10 minutes and work once.</p>
+  <button id="new-code">New pairing code</button>
+  <p class="code" id="code" aria-live="polite"></p>
+  <p class="muted" id="expires"></p>
+</section>
+
+<section>
+  <h2>Devices</h2>
+  <table>
+    <thead><tr><th>Name</th><th>Paired</th><th>Last seen</th><th></th></tr></thead>
+    <tbody id="devices"></tbody>
+  </table>
+</section>
+
+<script>
+const fmt = d => d ? new Date(d).toLocaleString() : '—';
+
+document.getElementById('new-code').onclick = async () => {
+  const r = await fetch('api/pairing-codes', { method: 'POST' });
+  const { code, expiresAt } = await r.json();
+  document.getElementById('code').textContent = code;
+  document.getElementById('expires').textContent = 'Expires ' + fmt(expiresAt);
+};
+
+async function loadDevices() {
+  const devices = await (await fetch('api/devices')).json();
+  const body = document.getElementById('devices');
+  body.replaceChildren(...devices.map(d => {
+    const tr = document.createElement('tr');
+    for (const v of [d.name, fmt(d.pairedAt), fmt(d.lastSeenAt)]) {
+      const td = document.createElement('td'); td.textContent = v; tr.append(td);
+    }
+    const td = document.createElement('td');
+    if (d.revokedAt) td.textContent = 'Revoked';
+    else {
+      const b = document.createElement('button');
+      b.textContent = 'Revoke';
+      b.onclick = async () => { await fetch(`api/devices/${d.id}/revoke`, { method: 'POST' }); loadDevices(); };
+      td.append(b);
+    }
+    tr.append(td);
+    return tr;
+  }));
+}
+loadDevices();
+</script>
+</body>
+</html>
