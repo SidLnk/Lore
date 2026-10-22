@@ -66,7 +66,8 @@ public sealed class FreeUp(Session session, Uploads uploads)
 			}
 		}
 		var inLore = media.Count - todo.Count + found;
-		return $"Checked {media.Count:N0} photos and videos on this phone: {inLore:N0} are safe in Lore. Free up space on the Upload tab.";
+		return $"Checked {media.Count:N0} photos and videos on this phone: {inLore:N0} are safe in Lore." +
+			(inLore > 0 ? " Free up space on the Upload tab." : "");
 	}
 
 	/// <summary>
