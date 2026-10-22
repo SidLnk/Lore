@@ -34,9 +34,21 @@ Storage layout under `G:\lore`:
 
 The live SQLite DB is on the `lore-db` Docker volume, not on `G:`. SQLite locking is unreliable over Windows bind mounts. To restore, copy a snapshot into the volume.
 
+## Build the release APK
+
+Release builds are signed with a key kept outside the repo, in `%USERPROFILE%\.lore\`:
+`lore-release.keystore` (alias `lore`) and `keystore-password.txt` (the password on two lines: store, then key).
+Back both up somewhere safe. Every update must be signed with this key, or Android refuses to install it over the old version.
+
+```
+dotnet publish src/Lore.App -f net10.0-android -c Release
+```
+
+The APK is `src/Lore.App/bin/Release/net10.0-android/publish/arpa.home.lore-Signed.apk`. Copy it to the phone (USB file transfer, Drive, chat), open it and allow **Install unknown apps** for the app you opened it from.
+
 ## Pair a phone
 
-1. Install the app: `dotnet build src/Lore.App -f net10.0-android -t:Install` with the phone connected over USB debugging.
+1. Install the app: the release APK above, or `dotnet build src/Lore.App -f net10.0-android -t:Install` with the phone connected over USB debugging.
 2. On the PC, open `http://lore.home.arpa/admin` (any username, admin password) and tap **New pairing code**.
 3. In the app, enter the server (`lore.home.arpa`, or the PC's IP if Private DNS is on), the code, and a phone name. Then pick whose phone it is.
 

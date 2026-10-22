@@ -18,6 +18,17 @@
 		<SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<!-- Release: an APK to sideload onto the family's phones. The key lives outside the repo (see README);
+	     every update must be signed with it or Android refuses to install over the old version. -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<AndroidPackageFormats>apk</AndroidPackageFormats>
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyStore>$(USERPROFILE)\.lore\lore-release.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>lore</AndroidSigningKeyAlias>
+		<AndroidSigningStorePass>file:$(USERPROFILE)\.lore\keystore-password.txt</AndroidSigningStorePass>
+		<AndroidSigningKeyPass>file:$(USERPROFILE)\.lore\keystore-password.txt</AndroidSigningKeyPass>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2B4C3F" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#2B4C3F" BaseSize="128,128" />
