@@ -192,10 +192,10 @@ One deep green on paper, with sage tints for the night theme and for quiet panel
 
 ## Layout
 
-The phone screen is the only canvas, in portrait first. There are two layout modes.
+Phone portrait is the first canvas; landscape, tablets and split screen restructure from the window width, never the device model. There are two layout modes.
 
-- **Collection grids** run edge to edge. Library and Home use 3 columns and the device-photo chooser uses 4. Tiles are square (screen width ÷ columns − 2px) with 2px gutters, under month headings padded 16px top and 6px bottom. Grids load more as you scroll (30 items before the end) and pull to refresh.
-- **Management pages** are a single column with 16px side padding (Pairing keeps 24px). Rhythm comes from contrast: 2–4px inside a group (a name and its detail line), 16px between items, 32px between groups (Family's members, this phone, and unpair).
+- **Collection grids** run edge to edge. Library and Home keep tiles about 130dp wide (never fewer than 3 columns) and the device-photo chooser about 100dp (never fewer than 4), so a phone shows 3 and 4 columns, a tablet in portrait 5–6 and 8, and landscape more. Tiles are always square, with 2px gutters, under month headings padded 16px top and 6px bottom. Grids load more as you scroll (30 items before the end) and pull to refresh. Home's Recent shows four full rows at any width.
+- **Management pages** are a single column with 16px side padding (Pairing keeps 24px). Rhythm comes from contrast: 2–4px inside a group (a name and its detail line), 16px between items, 32px between groups (Family's members, this phone, and unpair). On wide windows the column stops at 640dp (Places 720dp, Pairing 560dp) and stays aligned under the page title, not centred.
 
 Filters are one horizontally scrolling row of chips directly under the nav bar, with 12px side padding and 8px between chips. Photos therefore start about a fifth of the way down the screen. When anything is set, "Clear all" leads the row so it is never scrolled out of reach, followed by the place chip (if one is set), then owner, type, dates, favorites, album, folder, tag, location and device. Picking "Choose dates…" adds one row of from/to date pickers under the chips; nothing else expands.
 
@@ -276,8 +276,10 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 - Actions that can't do anything (Empty bin on an empty bin) are disabled, not hidden.
 
 ### Navigation
-- A bottom tab bar with five tabs: Home, Library, Upload, Places and Family. Icons are 24px outline glyphs at a 2px stroke.
+- Under 600dp wide: a bottom tab bar with five tabs: Home, Library, Upload, Places and Family. Icons are 24px outline glyphs at a 2px stroke.
 - The selected tab is Archive Green (Sage Mist at night); unselected tabs are Ink Soft (Gray 200 at night). The tab bar background is white (black at night).
+- 600dp and wider (tablets, phones in landscape): the same five destinations as an 80dp navigation rail on the start edge, with the Lore symbol (32dp) at the top. Each item is the icon over a 12px label; the selected one sits in a 56 × 32dp pill (Pale Celadon; Archive Green at night) with a Semibold label. The rail's top carries the status bar's green band and widens by any cutout on its side.
+- The viewer and video player are fullscreen at every size: they hide the rail as they hide the tabs.
 - The nav bar is white or off-black, flat and title-left, with text toolbar actions on the right.
 
 ### Admin Page (web, on the home PC)

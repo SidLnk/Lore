@@ -87,7 +87,6 @@ public partial class LibraryViewModel : ObservableObject
 	public ObservableCollection<FilterOption> Tags { get; } = [AnyTag];
 	public ObservableCollection<FilterOption> Devices { get; } = [AnyDevice];
 	public IReadOnlyList<FilterOption> GpsOptions { get; } = [AnyLocation, new("With location", true), new("Without location", false)];
-	public double TileSize { get; } = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 3 - 2;
 
 	[ObservableProperty] public partial OwnerOption SelectedOwner { get; set; }
 	[ObservableProperty] public partial int TypeIndex { get; set; }

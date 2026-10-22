@@ -38,7 +38,6 @@ public sealed class GalleryPage : ContentPage
 		_send.Clicked += async (_, _) => await SendAsync();
 		_settings.Clicked += (_, _) => AppInfo.Current.ShowSettingsUI();
 
-		var size = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 4 - 2;
 		_grid = new CollectionView
 		{
 			ItemsLayout = new GridItemsLayout(4, ItemsLayoutOrientation.Vertical) { HorizontalItemSpacing = 2, VerticalItemSpacing = 2 },
@@ -75,7 +74,7 @@ public sealed class GalleryPage : ContentPage
 					WidthRequest = 24, HeightRequest = 24, Margin = 6, HorizontalOptions = LayoutOptions.Start, VerticalOptions = LayoutOptions.Start,
 					Children = { new Ellipse { Stroke = Colors.White, StrokeThickness = 2, Fill = Color.FromArgb("#33000000") }, check },
 				};
-				var tile = new Grid { HeightRequest = size, Children = { image, video, mark } };
+				var tile = new SquareGrid { Children = { image, video, mark } };
 				tile.SetBinding(BackgroundColorProperty, static (GalleryItem i) => i.IsSelected, converter: new SelectedTile());
 				var tap = new TapGestureRecognizer();
 				tap.Tapped += (s, _) =>
@@ -89,6 +88,7 @@ public sealed class GalleryPage : ContentPage
 			}),
 		};
 		_grid.RemainingItemsThresholdReached += (_, _) => LoadMore();
+		Adaptive.FitColumns(_grid, 4, 100);
 
 		Content = new Grid
 		{

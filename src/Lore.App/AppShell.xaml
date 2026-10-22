@@ -5,14 +5,46 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 	xmlns:pages="clr-namespace:Lore.App.Pages"
 	Shell.FlyoutBehavior="Disabled"
+	FlyoutWidth="80"
+	FlyoutVerticalScrollMode="Disabled"
 	Title="Lore">
 
-	<TabBar>
-		<ShellContent Title="Home" Icon="tab_home.png" ContentTemplate="{DataTemplate pages:HomePage}" Route="home" />
-		<ShellContent Title="Library" Icon="tab_library.png" ContentTemplate="{DataTemplate pages:LibraryPage}" Route="library" />
-		<ShellContent Title="Upload" Icon="tab_upload.png" ContentTemplate="{DataTemplate pages:UploadPage}" Route="upload" />
-		<ShellContent Title="Places" Icon="tab_map.png" ContentTemplate="{DataTemplate pages:PlacesPage}" Route="places" />
-		<ShellContent Title="Family" Icon="tab_family.png" ContentTemplate="{DataTemplate pages:FamilyPage}" Route="family" />
-	</TabBar>
+	<!-- Rail icons aren't tinted, so each tab ships a dark-theme variant (the bottom bar tints either one).
+	     Phones: bottom tabs. Windows 600dp and wider: the same destinations as a navigation rail (a locked, narrow flyout). -->
+	<Shell.FlyoutHeader>
+		<Image
+			Source="{AppThemeBinding Light=lore_symbol.png, Dark=lore_symbol_dark.png}"
+			WidthRequest="32" HeightRequest="32" Margin="0,20,0,24" SemanticProperties.Description="Lore" />
+	</Shell.FlyoutHeader>
+
+	<Shell.ItemTemplate>
+		<DataTemplate x:DataType="BaseShellItem">
+			<VerticalStackLayout Padding="0,4,0,12" Spacing="4" SemanticProperties.Description="{Binding Title}">
+				<Border WidthRequest="56" HeightRequest="32" StrokeThickness="0" StrokeShape="RoundRectangle 16" HorizontalOptions="Center">
+					<Border.Triggers>
+						<DataTrigger TargetType="Border" Binding="{Binding IsChecked}" Value="True">
+							<Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Primary}}" />
+						</DataTrigger>
+					</Border.Triggers>
+					<Image Source="{Binding Icon}" WidthRequest="24" HeightRequest="24" />
+				</Border>
+				<Label Text="{Binding Title}" FontSize="12" HorizontalTextAlignment="Center">
+					<Label.Triggers>
+						<DataTrigger TargetType="Label" Binding="{Binding IsChecked}" Value="True">
+							<Setter Property="FontFamily" Value="OpenSansSemibold" />
+						</DataTrigger>
+					</Label.Triggers>
+				</Label>
+			</VerticalStackLayout>
+		</DataTemplate>
+	</Shell.ItemTemplate>
+
+	<FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+		<ShellContent Title="Home" Icon="{AppThemeBinding Light=tab_home.png, Dark=tab_home_dark.png}" ContentTemplate="{DataTemplate pages:HomePage}" Route="home" />
+		<ShellContent Title="Library" Icon="{AppThemeBinding Light=tab_library.png, Dark=tab_library_dark.png}" ContentTemplate="{DataTemplate pages:LibraryPage}" Route="library" />
+		<ShellContent Title="Upload" Icon="{AppThemeBinding Light=tab_upload.png, Dark=tab_upload_dark.png}" ContentTemplate="{DataTemplate pages:UploadPage}" Route="upload" />
+		<ShellContent Title="Places" Icon="{AppThemeBinding Light=tab_map.png, Dark=tab_map_dark.png}" ContentTemplate="{DataTemplate pages:PlacesPage}" Route="places" />
+		<ShellContent Title="Family" Icon="{AppThemeBinding Light=tab_family.png, Dark=tab_family_dark.png}" ContentTemplate="{DataTemplate pages:FamilyPage}" Route="family" />
+	</FlyoutItem>
 
 </Shell>

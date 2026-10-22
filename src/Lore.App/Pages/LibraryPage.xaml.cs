@@ -19,6 +19,7 @@ public partial class LibraryPage : ContentPage
 		InitializeComponent();
 		BindingContext = _vm = vm;
 		_viewer = viewer;
+		Adaptive.FitColumns(Media, 3, 130);
 		if (vm.IsBin) return;
 
 		_select.Clicked += (_, _) => vm.StartSelecting();

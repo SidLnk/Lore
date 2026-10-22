@@ -18,6 +18,7 @@ public sealed class OrganizePage : ContentPage
 		_library = library;
 		_viewer = viewer;
 		Title = "Organize";
+		Adaptive.CapWidth(this);
 		ToolbarItems.Add(new ToolbarItem { Text = "New folder", Command = new Command(async () => await RunAsync(NewFolderAsync(null))) });
 		ToolbarItems.Add(new ToolbarItem { Text = "New album", Command = new Command(async () => await RunAsync(NewAlbumAsync())) });
 		Content = new ScrollView { Content = _list };
@@ -180,6 +181,7 @@ public sealed class InfoPage : ContentPage
 		_viewer = viewer;
 		_item = viewer.Items[viewer.Index];
 		Title = "Info";
+		Adaptive.CapWidth(this);
 
 		var save = new Button { Text = "Save caption" };
 		save.Clicked += async (_, _) => await SaveCaptionAsync();

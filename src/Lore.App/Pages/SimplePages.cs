@@ -16,7 +16,8 @@ public sealed class HomePage : ContentPage
 	readonly Label _queue = new() { IsVisible = false, FontFamily = "OpenSansSemibold" };
 	readonly Button _bin = new() { Text = "Recycle bin", HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(-12, 0, 0, 0) };
 	readonly CollectionView _recent;
-	List<MediaItem> _items = [];
+	List<MediaItem> _items = [], _shown = [];
+	int _span = 3;
 
 	public HomePage(Session session, Uploads uploads, ViewerState viewer)
 	{
@@ -32,7 +33,7 @@ public sealed class HomePage : ContentPage
 			SelectionMode = SelectionMode.Single,
 			ItemTemplate = new DataTemplate(() =>
 			{
-				var image = new Image { Aspect = Aspect.AspectFill, HeightRequest = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 3 - 2 };
+				var image = new Image { Aspect = Aspect.AspectFill };
 				image.SetAppThemeColor(BackgroundColorProperty, Color.FromArgb("#E6E6E6"), Color.FromArgb("#2A2A2A"));
 				image.SetBinding(Image.SourceProperty, static (MediaItem m) => m.ThumbUrl);
 				var duration = new Label { TextColor = Colors.White, FontSize = 12, VerticalOptions = LayoutOptions.Center };
@@ -49,19 +50,20 @@ public sealed class HomePage : ContentPage
 					},
 				};
 				video.SetBinding(IsVisibleProperty, static (MediaItem m) => m.IsVideo);
-				return new Grid { Children = { image, video } };
+				return new SquareGrid { Children = { image, video } };
 			}),
 		};
 		_recent.SelectionChanged += async (_, e) =>
 		{
 			if (e.CurrentSelection.FirstOrDefault() is not MediaItem item) return;
 			_recent.SelectedItem = null;
-			_viewer.Items = [.. _items];
-			_viewer.Index = _items.IndexOf(item);
+			_viewer.Items = [.. _shown];
+			_viewer.Index = _shown.IndexOf(item);
 			_viewer.FromBin = false;
 			await Shell.Current.GoToAsync("viewer");
 		};
 		_bin.Clicked += async (_, _) => await Shell.Current.GoToAsync("bin");
+		Adaptive.FitColumns(_recent, 3, 130, span => { _span = span; ShowRecent(); });
 
 		var seeAll = new Button { Text = "See all", Style = (Style)Application.Current.Resources["TextButton"] };
 		seeAll.Clicked += async (_, _) => await Shell.Current.GoToAsync("//library");
@@ -88,6 +90,12 @@ public sealed class HomePage : ContentPage
 		};
 	}
 
+	void ShowRecent()
+	{
+		_shown = _items.Take(_span * 4).ToList();
+		_recent.ItemsSource = _shown;
+	}
+
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
@@ -103,8 +111,9 @@ public sealed class HomePage : ContentPage
 			var count = stats.Library.Sum(b => b.Count);
 			_storage.Text = $"{Format.Plural(count, "item")} · {Format.Bytes(used)} in Lore · {Format.Bytes(stats.VolumeFreeBytes)} free on the home PC";
 			_bin.Text = stats.BinCount == 0 ? "Recycle bin" : $"Recycle bin · {Format.Plural(stats.BinCount, "item")}";
-			_items = (await api.GetMediaAsync(new MediaQuery(), limit: 12)).Items.Select(m => new MediaItem(m, api)).ToList();
-			_recent.ItemsSource = _items;
+			// Enough for four full rows at the widest grid (9 columns); each width shows four rows.
+			_items = (await api.GetMediaAsync(new MediaQuery(), limit: 36)).Items.Select(m => new MediaItem(m, api)).ToList();
+			ShowRecent();
 		}
 		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
 		{
@@ -123,6 +132,7 @@ public sealed class FamilyPage : ContentPage
 	{
 		_session = session;
 		Title = "Family";
+		Adaptive.CapWidth(this);
 		var styles = Application.Current!.Resources;
 		var owners = session.Family.Select(f => new OwnerOption(f.Id, f.Name)).ToList();
 		var picker = new Picker { Title = "This phone belongs to", ItemsSource = owners, SelectedItem = owners.FirstOrDefault(o => o.Id == session.DefaultOwnerId) };

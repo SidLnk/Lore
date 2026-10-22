@@ -28,6 +28,7 @@ public sealed class PlacesPage : ContentPage
 		_session = session;
 		_library = library;
 		Title = "Places";
+		Adaptive.CapWidth(this, 720);
 
 		_canvas = new GraphicsView { Drawable = _plot, HeightRequest = 240 };
 		_canvas.EndInteraction += async (_, e) =>

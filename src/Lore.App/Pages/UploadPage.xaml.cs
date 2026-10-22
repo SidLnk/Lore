@@ -8,6 +8,7 @@ public partial class UploadPage : ContentPage
 	public UploadPage(UploadViewModel vm)
 	{
 		InitializeComponent();
+		Adaptive.CapWidth(this);
 		BindingContext = _vm = vm;
 	}
 

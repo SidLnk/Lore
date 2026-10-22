@@ -34,6 +34,7 @@
 
 		<RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding ReloadCommand}">
 			<CollectionView
+				x:Name="Media"
 				ItemsSource="{Binding Groups}"
 				IsGrouped="True"
 				RemainingItemsThreshold="30"
@@ -52,11 +53,9 @@
 				<CollectionView.ItemTemplate>
 					<DataTemplate x:DataType="pages:MediaItem">
 						<!-- Selected: the photo insets onto a tonal tile and gets a drawn check, so it stays visible. -->
-						<Grid
-							HeightRequest="{Binding Vm.TileSize, Source={x:Reference Root}, x:DataType=pages:LibraryPage}"
-							BackgroundColor="{AppThemeBinding Light=#E6E6E6, Dark=#2A2A2A}">
+						<pages:SquareGrid BackgroundColor="{AppThemeBinding Light=#E6E6E6, Dark=#2A2A2A}">
 							<Grid.Triggers>
-								<DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+								<DataTrigger TargetType="pages:SquareGrid" Binding="{Binding IsSelected}" Value="True">
 									<Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Tertiary}}" />
 								</DataTrigger>
 							</Grid.Triggers>
@@ -86,7 +85,7 @@
 										StrokeLineCap="Round" StrokeLineJoin="Round" Aspect="None" />
 								</Grid>
 							</Grid>
-						</Grid>
+						</pages:SquareGrid>
 					</DataTemplate>
 				</CollectionView.ItemTemplate>
 			</CollectionView>

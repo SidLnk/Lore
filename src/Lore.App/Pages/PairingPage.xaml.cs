@@ -9,6 +9,7 @@ public partial class PairingPage : ContentPage
 	public PairingPage(Session session)
 	{
 		InitializeComponent();
+		Adaptive.CapWidth(this, 560);
 		_session = session;
 		NameEntry.Text = DeviceInfo.Current.Name;
 	}
