@@ -9,8 +9,9 @@ RUN dotnet publish src/Lore.Api -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 # ffmpeg: video poster frames + ffprobe metadata. No transcoding in V1.
+# libheif (heif-convert + the libde265 HEVC plugin): HEIC/HEIF thumbnails, which Skia can't decode on Linux.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ffmpeg tzdata \
+ && apt-get install -y --no-install-recommends ffmpeg tzdata libheif-examples libheif-plugin-libde265 \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /db /data && chown app:app /db /data
 WORKDIR /app

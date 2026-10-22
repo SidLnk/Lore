@@ -57,6 +57,10 @@ public sealed partial class MetadataIngestStep(Ffmpeg ffmpeg, ILogger<MetadataIn
         }
 
         if (Skia.Dimensions(path) is { } size) (m.Width, m.Height) = size;
+        // Skia can't read HEIC on Linux: fall back to the EXIF pixel size, swapped for 90-degree orientations.
+        else if (sub != null && sub.TryGetInt32(ExifDirectoryBase.TagExifImageWidth, out var w) &&
+                 sub.TryGetInt32(ExifDirectoryBase.TagExifImageHeight, out var h))
+            (m.Width, m.Height) = ifd0 != null && ifd0.TryGetInt32(ExifDirectoryBase.TagOrientation, out var o) && o >= 5 ? (h, w) : (w, h);
     }
 
     async Task ReadVideoAsync(string path, MediaAssetRow m, CancellationToken ct)
@@ -122,7 +126,7 @@ public sealed partial class MetadataIngestStep(Ffmpeg ffmpeg, ILogger<MetadataIn
     }
 }
 
-/// <summary>Thin wrapper over the ffmpeg/ffprobe CLIs. Missing binaries degrade to "no metadata / no thumbnail".</summary>
+/// <summary>Thin wrapper over the ffmpeg/ffprobe/heif-convert CLIs. Missing binaries degrade to "no metadata / no thumbnail".</summary>
 public sealed class Ffmpeg(ILogger<Ffmpeg> log)
 {
     Task<bool>? _available;
@@ -142,6 +146,13 @@ public sealed class Ffmpeg(ILogger<Ffmpeg> log)
         var scale = $"scale='min({maxSize},iw)':'min({maxSize},ih)':force_original_aspect_ratio=decrease";
         var (code, _) = await RunAsync("ffmpeg",
             ["-v", "error", "-y", "-ss", atSeconds.ToString(CultureInfo.InvariantCulture), "-i", input, "-frames:v", "1", "-vf", scale, "-q:v", "4", output], ct);
+        return code == 0 && File.Exists(output) && new FileInfo(output).Length > 0;
+    }
+
+    /// <summary>Full-size upright JPEG from HEIC/HEIF via libheif (applies irot/imir, resets the EXIF orientation).</summary>
+    public async Task<bool> HeifToJpegAsync(string input, string output, CancellationToken ct)
+    {
+        var (code, _) = await RunAsync("heif-convert", ["-q", "92", input, output], ct);
         return code == 0 && File.Exists(output) && new FileInfo(output).Length > 0;
     }
 

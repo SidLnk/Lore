@@ -159,7 +159,7 @@ One deep green on paper, with sage tints for the night theme and for quiet panel
 - **Off-Black** (#1F1F1F): page and nav bar background in the dark theme. The dark tab bar is pure black (#000000).
 - **Ink** (#000000) / **Ink Soft** (#212121): body text and picker text in the light theme; Ink Soft is the unselected tab colour.
 - **Linen Mint** (#EEF3F0) / **Night Moss** (#1E2A25): the tonal panel behind the Places dot plot, light and dark.
-- **Tile Placeholder** (#E6E6E6) / **Tile Placeholder Dark** (#2A2A2A): what a photo tile shows before its thumbnail loads, or when no thumbnail exists (HEIC, missing ffmpeg).
+- **Tile Placeholder** (#E6E6E6) / **Tile Placeholder Dark** (#2A2A2A): what a photo tile shows before its thumbnail loads, or when no thumbnail exists (missing ffmpeg or libheif, or a format neither can read).
 - **Gray ramp** (#C8C8C8, #ACACAC, #6E6E6E, #404040, #141414): disabled controls, placeholders, inactive chip outlines (#ACACAC light, #6E6E6E dark) and the dark-theme unselected tab.
 
 ### Danger

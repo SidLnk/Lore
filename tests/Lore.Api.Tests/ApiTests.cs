@@ -126,6 +126,24 @@ public sealed class ApiTests : IDisposable
     }
 
     [Fact]
+    public async Task Heic_metadata_comes_from_exif()
+    {
+        var api = await _f.PairAsync();
+        // 600x400 HEVC with irot + EXIF orientation 6, made by heif-enc: displays as 400x600.
+        var heic = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Fixtures", "rotated.heic"));
+        var up = await api.CreateUploadAsync(new(Fixtures.Sha256(heic), heic.Length, "IMG_2.HEIC", "image/heic", 1, null));
+        await api.PutChunkAsync(up.UploadId!.Value, 0, heic);
+        var done = await api.CompleteUploadAsync(up.UploadId!.Value);
+        var m = (await api.GetMediaAsync(new MediaQuery())).Items.Single(x => x.Id == done.MediaId);
+
+        Assert.Equal(new DateTime(2024, 5, 6, 7, 8, 9), m.DateTaken);
+        Assert.Equal(1.29, m.Latitude!.Value, 3);
+        Assert.Equal(103.85, m.Longitude!.Value, 3);
+        Assert.Equal((400, 600), (m.Width, m.Height));
+        // The thumbnail needs heif-convert, which only the container has; the Docker smoke test covers it.
+    }
+
+    [Fact]
     public async Task Original_supports_range_requests()
     {
         var api = await _f.PairAsync();

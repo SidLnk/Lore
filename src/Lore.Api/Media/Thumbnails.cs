@@ -29,7 +29,7 @@ public sealed class Thumbnails(string derivedRoot, StorageRegistry storage, Ffmp
         return Path.Combine(derivedRoot, kind, id[..2], id + ".jpg");
     }
 
-    /// <returns>Path to a JPEG, or null when this media can't be rendered (e.g. HEIC).</returns>
+    /// <returns>Path to a JPEG, or null when this media can't be rendered (e.g. HEIC without libheif).</returns>
     public async Task<string?> GetAsync(MediaAssetRow m, string kind, CancellationToken ct)
     {
         var path = PathFor(m.Id, kind);
@@ -69,8 +69,28 @@ public sealed class Thumbnails(string derivedRoot, StorageRegistry storage, Ffmp
             return await ffmpeg.FrameAsync(src, output, size, 1, ct) || await ffmpeg.FrameAsync(src, output, size, 0, ct);
         }
 
-        await using var stream = volume.OpenRead(m.ObjectKey);
-        if (Skia.WriteJpegThumbnail(stream, output, size)) return true;
+        await using (var stream = volume.OpenRead(m.ObjectKey))
+            if (Skia.WriteJpegThumbnail(stream, output, size)) return true;
+
+        if (m.MimeType is "image/heic" or "image/heif")
+        {
+            // Skia on Linux has no HEIF codec: libheif decodes to a full-size JPEG, then Skia scales it as usual.
+            string src;
+            await using (var fs = (FileStream)volume.OpenRead(m.ObjectKey)) src = fs.Name;
+            var full = output + ".full.jpg";
+            try
+            {
+                if (await ffmpeg.HeifToJpegAsync(src, full, ct))
+                {
+                    await using var decoded = File.OpenRead(full);
+                    if (Skia.WriteJpegThumbnail(decoded, output, size)) return true;
+                }
+            }
+            finally
+            {
+                File.Delete(full);
+            }
+        }
         log.LogInformation("No thumbnail for {Id} ({Mime})", m.Id, m.MimeType);
         return false;
     }
