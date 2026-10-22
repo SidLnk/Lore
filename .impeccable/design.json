@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-22T02:40:57.880893+00:00",
+  "generatedAt": "2026-10-22T02:56:22.378345+00:00",
   "title": "Design System: Lore",
   "extensions": {
     "colorMeta": {
@@ -394,8 +394,8 @@
       "kind": "custom",
       "refersTo": "photo-tile",
       "description": "Square edge-to-edge grid tile with video badge and selection states.",
-      "html": "<div class=\"ds-grid\"><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#c97b4a,#e8c07a)\"></div><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#4a7bc9,#9fd0e8)\"><span class=\"ds-dur\">0:12</span></div><div class=\"ds-tile ds-selected\" style=\"background:linear-gradient(135deg,#6a9a5b,#d6e8a3)\"><span class=\"ds-check\">&#10003;</span></div></div>",
-      "css": ".ds-grid { display: grid; grid-template-columns: repeat(3, 96px); gap: 2px; } .ds-tile { position: relative; width: 96px; height: 96px; background: #E6E6E6; } .ds-dur { position: absolute; right: 4px; bottom: 4px; font: 12px 'Open Sans', sans-serif; color: #fff; background: rgba(0,0,0,.5); padding: 2px 4px; } .ds-selected::after { content: ''; position: absolute; inset: 0; background: #2B4C3F; opacity: .35; } .ds-check { position: absolute; left: 6px; top: 6px; z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; background: #2B4C3F; color: #fff; font: 16px 'Open Sans', sans-serif; }"
+      "html": "<div class=\"ds-grid\"><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#c97b4a,#e8c07a)\"></div><div class=\"ds-tile\" style=\"background:linear-gradient(135deg,#4a7bc9,#9fd0e8)\"><span class=\"ds-dur\"><svg width=\"7\" height=\"9\" viewBox=\"0 0 7 9\"><path d=\"M0 0l7 4.5L0 9z\" fill=\"#fff\"/></svg> 0:12</span></div><div class=\"ds-tile ds-selected\"><div class=\"ds-photo\" style=\"background:linear-gradient(135deg,#6a9a5b,#d6e8a3)\"></div><span class=\"ds-check\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><path d=\"M2 6.5l2.5 2.5L10 3.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span></div></div>",
+      "css": ".ds-grid { display: grid; grid-template-columns: repeat(3, 96px); gap: 2px; } .ds-tile { position: relative; width: 96px; height: 96px; background: #E6E6E6; } .ds-dur { position: absolute; right: 4px; bottom: 4px; font: 12px 'Open Sans', sans-serif; color: #fff; background: rgba(0,0,0,.5); padding: 2px 4px; } .ds-selected { background: #DCEBE3 !important; } .ds-selected .ds-photo { position: absolute; inset: 12px; } .ds-check { position: absolute; left: 6px; top: 6px; width: 24px; height: 24px; border-radius: 50%; background: #2B4C3F; border: 2px solid #fff; box-sizing: border-box; display: grid; place-items: center; }"
     },
     {
       "name": "Month Header",

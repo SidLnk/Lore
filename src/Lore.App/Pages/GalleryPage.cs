@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls.Shapes;
+using Path = Microsoft.Maui.Controls.Shapes.Path;
 using Lore.App.Droid;
 using Lore.App.Services;
 
@@ -44,20 +46,37 @@ public sealed class GalleryPage : ContentPage
 			ItemsSource = _items,
 			ItemTemplate = new DataTemplate(() =>
 			{
-				var image = new Image { Aspect = Aspect.AspectFill, HeightRequest = size, BackgroundColor = Color.FromArgb("#E6E6E6") };
+				// Same selection language as the Library: inset photo on a tonal tile, drawn ring and check.
+				var image = new Image { Aspect = Aspect.AspectFill };
 				image.SetBinding(Image.SourceProperty, static (GalleryItem i) => i.Thumb);
-				var video = new Label { Text = "▶", TextColor = Colors.White, FontSize = 14, Margin = 4, HorizontalOptions = LayoutOptions.End, VerticalOptions = LayoutOptions.End };
-				video.SetBinding(IsVisibleProperty, static (GalleryItem i) => i.IsVideo);
-				var shade = new BoxView { Color = Color.FromArgb("#2B4C3F"), Opacity = 0.35 };
-				shade.SetBinding(IsVisibleProperty, static (GalleryItem i) => i.IsSelected);
-				var check = new Label
+				image.SetBinding(View.MarginProperty, static (GalleryItem i) => i.IsSelected, converter: new SelectedInset());
+				var video = new Grid
 				{
-					Text = "✓", TextColor = Colors.White, BackgroundColor = Color.FromArgb("#2B4C3F"), FontSize = 14, Margin = 4,
-					WidthRequest = 24, HeightRequest = 24, HorizontalTextAlignment = TextAlignment.Center, VerticalTextAlignment = TextAlignment.Center,
-					HorizontalOptions = LayoutOptions.Start, VerticalOptions = LayoutOptions.Start,
+					Padding = new Thickness(6, 3), Margin = 4, BackgroundColor = Color.FromArgb("#80000000"),
+					HorizontalOptions = LayoutOptions.End, VerticalOptions = LayoutOptions.End,
+					Children = { new Path { Data = (Geometry)new PathGeometryConverter().ConvertFromInvariantString("M0,0 L7,4.5 L0,9 Z")!, Fill = Colors.White, WidthRequest = 7, HeightRequest = 9 } },
+				};
+				video.SetBinding(IsVisibleProperty, static (GalleryItem i) => i.IsVideo);
+				var check = new Grid
+				{
+					Children =
+					{
+						new Ellipse { Fill = Color.FromArgb("#2B4C3F"), Stroke = Colors.White, StrokeThickness = 2 },
+						new Path
+						{
+							Data = (Geometry)new PathGeometryConverter().ConvertFromInvariantString("M7,12.5 L10.5,16 L17,9")!,
+							Stroke = Colors.White, StrokeThickness = 2.25, StrokeLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round, Aspect = Stretch.None,
+						},
+					},
 				};
 				check.SetBinding(IsVisibleProperty, static (GalleryItem i) => i.IsSelected);
-				var tile = new Grid { Children = { image, video, shade, check } };
+				var mark = new Grid
+				{
+					WidthRequest = 24, HeightRequest = 24, Margin = 6, HorizontalOptions = LayoutOptions.Start, VerticalOptions = LayoutOptions.Start,
+					Children = { new Ellipse { Stroke = Colors.White, StrokeThickness = 2, Fill = Color.FromArgb("#33000000") }, check },
+				};
+				var tile = new Grid { HeightRequest = size, Children = { image, video, mark } };
+				tile.SetBinding(BackgroundColorProperty, static (GalleryItem i) => i.IsSelected, converter: new SelectedTile());
 				var tap = new TapGestureRecognizer();
 				tap.Tapped += (s, _) =>
 				{
@@ -112,4 +131,21 @@ public sealed class GalleryPage : ContentPage
 		await _uploads.EnqueueAsync(picked, owner);
 		await Shell.Current.GoToAsync("..");
 	}
+}
+
+sealed class SelectedInset : IValueConverter
+{
+	public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) =>
+		value is true ? new Thickness(10) : new Thickness(0);
+	public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
+}
+
+sealed class SelectedTile : IValueConverter
+{
+	public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+	{
+		var dark = Application.Current?.RequestedTheme == AppTheme.Dark;
+		return value is true ? Color.FromArgb(dark ? "#1B3329" : "#DCEBE3") : Color.FromArgb(dark ? "#2A2A2A" : "#E6E6E6");
+	}
+	public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
 }

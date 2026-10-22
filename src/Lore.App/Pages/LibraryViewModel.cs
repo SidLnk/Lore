@@ -27,7 +27,10 @@ public sealed partial class MediaItem(MediaDto dto, LoreApiClient api) : Observa
 	public Uri OriginalUrl { get; } = api.OriginalUrl(dto.Id);
 	public bool IsVideo => Dto.MediaType == MediaTypes.Video;
 	public string DurationText => Dto.Duration is { } d ? TimeSpan.FromSeconds(d).ToString(d >= 3600 ? @"h\:mm\:ss" : @"m\:ss") : "";
+	public bool HasDuration => Dto.Duration != null;
 	[ObservableProperty] public partial bool IsSelected { get; set; }
+	/// <summary>Library is in select mode: show the empty selection ring on every tile.</summary>
+	[ObservableProperty] public partial bool IsSelecting { get; set; }
 }
 
 public sealed class MonthGroup(DateTime month) : ObservableCollection<MediaItem>
@@ -346,11 +349,15 @@ public partial class LibraryViewModel : ObservableObject
 			{
 				var month = new DateTime(dto.DateTaken.Year, dto.DateTaken.Month, 1);
 				if (Groups.LastOrDefault() is not { } group || group.Month != month) Groups.Add(group = new MonthGroup(month));
-				group.Add(new MediaItem(dto, api));
+				group.Add(new MediaItem(dto, api) { IsSelecting = IsSelecting });
 			}
 			_cursor = page.NextCursor;
 			_end = _cursor == null;
-			Message = Groups.Count == 0 ? (IsBin ? "The recycle bin is empty." : "Nothing here yet.") : null;
+			Message = Groups.Count > 0 ? null
+				: IsBin ? "The recycle bin is empty. Deleted photos and videos wait here until you empty it."
+				: AnyActive ? "Nothing matches these filters. Tap Clear all to see everything."
+				: "No photos yet. Add some from the Upload tab.";
+			OnPageLoaded();
 		}
 		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
 		{
@@ -361,6 +368,8 @@ public partial class LibraryViewModel : ObservableObject
 			if (generation == _generation) _loading = false;
 		}
 	}
+
+	protected virtual void OnPageLoaded() { }
 
 	/// <summary>Tap: opens the viewer, or toggles the item while selecting.</summary>
 	[RelayCommand]
@@ -379,12 +388,16 @@ public partial class LibraryViewModel : ObservableObject
 		await Shell.Current.GoToAsync("viewer");
 	}
 
-	public void StartSelecting() => IsSelecting = true;
+	public void StartSelecting()
+	{
+		IsSelecting = true;
+		foreach (var item in Groups.SelectMany(g => g)) item.IsSelecting = true;
+	}
 
 	public void StopSelecting()
 	{
 		IsSelecting = false;
-		foreach (var item in Groups.SelectMany(g => g)) item.IsSelected = false;
+		foreach (var item in Groups.SelectMany(g => g)) (item.IsSelected, item.IsSelecting) = (false, false);
 		SelectedCount = 0;
 	}
 
@@ -406,7 +419,12 @@ public partial class LibraryViewModel : ObservableObject
 
 public sealed partial class BinViewModel(Session session, ViewerState viewer, Organizer organizer) : LibraryViewModel(session, viewer, organizer, bin: true)
 {
-	[RelayCommand]
+	bool CanEmpty => Groups.Count > 0;
+
+	// Grey out "Empty bin" when there is nothing to erase.
+	protected override void OnPageLoaded() => EmptyCommand.NotifyCanExecuteChanged();
+
+	[RelayCommand(CanExecute = nameof(CanEmpty))]
 	async Task EmptyAsync()
 	{
 		if (Groups.Count == 0 || Session.Api is not { } api) return;

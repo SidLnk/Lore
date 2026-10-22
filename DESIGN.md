@@ -241,8 +241,10 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 
 ### Photo Tile (signature)
 - A square image with Aspect Fill, a Tile Placeholder background while loading, and no corner radius.
-- **Video:** a white duration label (12px) on a 50% black badge, bottom right, with 4px margin.
-- **Selected:** an Archive Green overlay at 35% opacity over the whole tile, plus a 28px Archive Green square with a white ✓ in the top-left corner (6px inset).
+- **Video:** a drawn white play triangle (7 × 9) in the 50% black badge, followed by the duration when it is known.
+- **Selecting:** every tile shows a 24px white ring (2px stroke, 20% black fill) in the top-left corner, 6px inset.
+- **Selected:** the photo insets by 12px onto a tonal tile (Pale Celadon; Deep Archive Green at night), and the ring fills with Archive Green (Sage Mist at night) and a drawn check. Never cover the photo with an overlay: it must stay recognisable.
+- The device-photo chooser uses the same selection language, with the ring always visible.
 - Tap opens the viewer, or toggles selection while selecting.
 
 ### Month Header
@@ -262,6 +264,16 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 ### Place Row and Plot
 - **Row:** a 64px square thumbnail, coordinates in Body Large ("1.291°N, 103.852°E"), a detail line ("2 items · Oct 2026") and an outlined Maps button.
 - **Plot:** a 240px Linen Mint panel with 12px corners and 28px inner padding. Each place is an Archive Green dot at 75% opacity whose radius grows with the item count (4 + 3·log₂ count). No map tiles.
+
+### Icons
+- 24px outline glyphs at a 2px stroke with round caps and joins, drawn as SVG (tab bar, viewer toolbar) or as MAUI paths (play, check, chevron, close).
+- Viewer toolbar: heart (outline, or filled when a favorite), info and trash (restore inside the bin). Each icon has a text name for screen readers and the overflow menu.
+- Android doesn't tint toolbar icons, so each ships a light-bar variant (black) and a dark-bar variant (Sage Text #6FA88C), switched by theme.
+- No text glyphs (✓ ▶ ♡) as icons.
+
+### Empty States
+- Centred body text with 32px side and 48px top margins that says what to do next: "No photos yet. Add some from the Upload tab." / "Nothing matches these filters. Tap Clear all to see everything." / "The recycle bin is empty. Deleted photos and videos wait here until you empty it."
+- Actions that can't do anything (Empty bin on an empty bin) are disabled, not hidden.
 
 ### Navigation
 - A bottom tab bar with five tabs: Home, Library, Upload, Places and Family. Icons are 24px outline glyphs at a 2px stroke.

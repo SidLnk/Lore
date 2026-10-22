@@ -61,7 +61,11 @@ public sealed class OrganizePage : ContentPage
 		{
 			ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)],
 			Padding = new Thickness(depth * 20, 10, 0, 10),
-			Children = { new Label { Text = name, FontSize = 16 }, new Label { Text = count.ToString("N0"), Opacity = 0.6 }.Column(1) },
+			Children =
+			{
+				new Label { Text = name, FontSize = 16, VerticalOptions = LayoutOptions.Center },
+				new Label { Text = count.ToString("N0"), Style = (Style)Application.Current!.Resources["Quiet"], VerticalOptions = LayoutOptions.Center }.Column(1),
+			},
 		};
 		row.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(async () => await RunAsync(onTap())) });
 		_list.Add(row);
@@ -229,33 +233,47 @@ public sealed class InfoPage : ContentPage
 			var m = d.Media;
 
 			_caption.Text = m.Caption;
-			_facts.Clear();
-			Fact(m.OriginalFilename, bold: true);
-			Fact($"{m.DateTaken:dddd d MMMM yyyy, HH:mm}");
-			Fact(string.Join(" · ", new[]
-			{
-				m.MediaType == MediaTypes.Video ? "Video" : "Photo",
-				m.Width is { } w && m.Height is { } h ? $"{w}×{h}" : null,
-				_item.DurationText is { Length: > 0 } dur ? dur : null,
-				Format.Bytes(m.FileSize),
-			}.Where(s => s != null)));
-			if (m.CameraMake != null || m.CameraModel != null) Fact($"Camera: {m.CameraMake} {m.CameraModel}".Trim());
 			_location = m.Latitude is { } lat && m.Longitude is { } lon ? (lat, lon) : null;
 			_maps.IsVisible = _location != null;
-			Fact(_location is var (la, lo) ? $"Location: {la:0.#####}, {lo:0.#####}" : "No location");
-			Fact($"Belongs to {_session.MemberName(m.OwnerId)} · uploaded by {_session.MemberName(m.UploadedById)}{(d.DeviceName == null ? "" : " from " + d.DeviceName)}");
-			Fact("Folder: " + (folders.FirstOrDefault(f => f.Folder.Id == m.FolderId).Path ?? "none"));
-			Fact("Albums: " + (d.AlbumIds.Count == 0 ? "none" : string.Join(", ", albums.Where(a => d.AlbumIds.Contains(a.Id)).Select(a => a.Name))));
-			Fact("Tags: " + (d.Tags.Count == 0 ? "none" : string.Join(", ", d.Tags)));
+			var styles = Application.Current!.Resources;
+
+			// Title block, then a label/value table so each fact scans in one column.
+			_facts.Clear();
+			_facts.Add(new Label { Text = m.OriginalFilename, Style = (Style)styles["SectionTitle"], LineBreakMode = LineBreakMode.MiddleTruncation });
+			_facts.Add(new Label
+			{
+				Style = (Style)styles["Quiet"],
+				Text = string.Join(" · ", new[]
+				{
+					$"{m.DateTaken:ddd d MMM yyyy, HH:mm}",
+					m.MediaType == MediaTypes.Video ? "Video" : "Photo",
+					m.Width is { } w && m.Height is { } h ? $"{w}×{h}" : null,
+					_item.DurationText is { Length: > 0 } dur ? dur : null,
+					Format.Bytes(m.FileSize),
+				}.Where(s => s != null)),
+			});
+			var table = new Grid { ColumnDefinitions = [new(new GridLength(104)), new(GridLength.Star)], ColumnSpacing = 12, RowSpacing = 8, Margin = new Thickness(0, 12, 0, 0) };
+			void Row(string label, string value)
+			{
+				var row = table.RowDefinitions.Count;
+				table.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+				table.Add(new Label { Text = label, Style = (Style)styles["Quiet"], FontSize = 14 }.Row(row));
+				table.Add(new Label { Text = value }.Row(row).Column(1));
+			}
+			Row("Belongs to", _session.MemberName(m.OwnerId) ?? "Unknown");
+			Row("Uploaded by", $"{_session.MemberName(m.UploadedById)}{(d.DeviceName == null ? "" : " · " + d.DeviceName)}");
+			Row("Location", _location is var (la, lo) ? Format.Coordinates(la, lo) : "None");
+			if (m.CameraMake != null || m.CameraModel != null) Row("Camera", $"{m.CameraMake} {m.CameraModel}".Trim());
+			Row("Folder", folders.FirstOrDefault(f => f.Folder.Id == m.FolderId).Path ?? "None");
+			Row("Albums", d.AlbumIds.Count == 0 ? "None" : string.Join(", ", albums.Where(a => d.AlbumIds.Contains(a.Id)).Select(a => a.Name)));
+			Row("Tags", d.Tags.Count == 0 ? "None" : string.Join(", ", d.Tags));
+			_facts.Add(table);
 		}
 		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
 		{
 			_status.Text = "Couldn't reach Lore. Are you on home Wi-Fi?";
 		}
 	}
-
-	void Fact(string text, bool bold = false) =>
-		_facts.Add(new Label { Text = text, FontSize = bold ? 18 : 14, FontFamily = bold ? "OpenSansSemibold" : null });
 
 	async Task SaveCaptionAsync()
 	{

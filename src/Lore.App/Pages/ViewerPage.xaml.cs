@@ -17,16 +17,24 @@ public partial class ViewerPage : ContentPage
 		_state = state;
 		_session = session;
 		_favorite.Clicked += OnFavorite;
-		_remove.Text = state.FromBin ? "Restore" : "Delete";
+		// Icons keep the title readable; Text is the accessible name and the overflow-menu label.
+		_remove.Text = state.FromBin ? "Restore" : "Move to recycle bin";
+		SetIcon(_remove, state.FromBin ? "icon_restore" : "icon_delete");
 		_remove.Clicked += OnRemove;
 		if (!state.FromBin)
 		{
 			ToolbarItems.Add(_favorite);
-			ToolbarItems.Add(new ToolbarItem { Text = "Info", Command = new Command(async () => await Shell.Current.GoToAsync("info")) });
+			var info = new ToolbarItem { Text = "Info", Command = new Command(async () => await Shell.Current.GoToAsync("info")) };
+			SetIcon(info, "icon_info");
+			ToolbarItems.Add(info);
 		}
 		ToolbarItems.Add(_remove);
 		Show();
 	}
+
+	// Android doesn't tint toolbar icons, so each has a light-bar and a dark-bar variant.
+	static void SetIcon(ToolbarItem item, string name) =>
+		item.SetAppTheme<ImageSource>(MenuItem.IconImageSourceProperty, name + ".png", name + "_dark.png");
 
 	MediaItem? Current => _state.Items.ElementAtOrDefault(_state.Index);
 
@@ -46,7 +54,8 @@ public partial class ViewerPage : ContentPage
 		if (Current is not { } item) return;
 		Photo.Source = item.PreviewUrl;
 		PlayButton.IsVisible = item.IsVideo;
-		_favorite.Text = item.Favorite ? "♥ Favorite" : "♡ Favorite";
+		_favorite.Text = item.Favorite ? "Remove from favorites" : "Add to favorites";
+		SetIcon(_favorite, item.Favorite ? "icon_heart_filled" : "icon_heart");
 		var owner = _session.MemberName(item.Dto.OwnerId);
 		Title = $"{item.Dto.DateTaken:d MMM yyyy, HH:mm}{(owner == null ? "" : " · " + owner)}";
 	}

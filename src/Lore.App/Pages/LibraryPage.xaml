@@ -37,8 +37,10 @@
 				ItemsSource="{Binding Groups}"
 				IsGrouped="True"
 				RemainingItemsThreshold="30"
-				RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
-				EmptyView="{Binding Message}">
+				RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+				<CollectionView.EmptyView>
+					<Label Text="{Binding Message}" HorizontalTextAlignment="Center" Margin="32,48" />
+				</CollectionView.EmptyView>
 				<CollectionView.ItemsLayout>
 					<GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="2" VerticalItemSpacing="2" />
 				</CollectionView.ItemsLayout>
@@ -49,25 +51,41 @@
 				</CollectionView.GroupHeaderTemplate>
 				<CollectionView.ItemTemplate>
 					<DataTemplate x:DataType="pages:MediaItem">
+						<!-- Selected: the photo insets onto a tonal tile and gets a drawn check, so it stays visible. -->
 						<Grid
 							HeightRequest="{Binding Vm.TileSize, Source={x:Reference Root}, x:DataType=pages:LibraryPage}"
 							BackgroundColor="{AppThemeBinding Light=#E6E6E6, Dark=#2A2A2A}">
+							<Grid.Triggers>
+								<DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+									<Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Tertiary}}" />
+								</DataTrigger>
+							</Grid.Triggers>
 							<Grid.GestureRecognizers>
 								<TapGestureRecognizer
 									Command="{Binding Vm.OpenCommand, Source={x:Reference Root}, x:DataType=pages:LibraryPage}"
 									CommandParameter="{Binding .}" />
 							</Grid.GestureRecognizers>
-							<Image Source="{Binding ThumbUrl}" Aspect="AspectFill" />
-							<Label
-								Text="{Binding DurationText}" IsVisible="{Binding IsVideo}"
-								TextColor="White" FontSize="12" Padding="4,2" Margin="4"
-								BackgroundColor="#80000000" HorizontalOptions="End" VerticalOptions="End" />
-							<BoxView Color="{StaticResource Primary}" Opacity="0.35" IsVisible="{Binding IsSelected}" />
-							<Label
-								Text="✓" IsVisible="{Binding IsSelected}"
-								TextColor="White" BackgroundColor="{StaticResource Primary}" FontSize="16"
-								WidthRequest="28" HeightRequest="28" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
-								Margin="6" HorizontalOptions="Start" VerticalOptions="Start" />
+							<Image Source="{Binding ThumbUrl}" Aspect="AspectFill">
+								<Image.Triggers>
+									<DataTrigger TargetType="Image" Binding="{Binding IsSelected}" Value="True">
+										<Setter Property="Margin" Value="12" />
+									</DataTrigger>
+								</Image.Triggers>
+							</Image>
+							<HorizontalStackLayout
+								IsVisible="{Binding IsVideo}" Spacing="4" Padding="6,3" Margin="4"
+								BackgroundColor="#80000000" HorizontalOptions="End" VerticalOptions="End">
+								<Path Data="M0,0 L7,4.5 L0,9 Z" Fill="White" WidthRequest="7" HeightRequest="9" VerticalOptions="Center" />
+								<Label Text="{Binding DurationText}" IsVisible="{Binding HasDuration}" TextColor="White" FontSize="12" VerticalOptions="Center" />
+							</HorizontalStackLayout>
+							<Grid WidthRequest="24" HeightRequest="24" Margin="6" HorizontalOptions="Start" VerticalOptions="Start" IsVisible="{Binding IsSelecting}">
+								<Ellipse Stroke="White" StrokeThickness="2" Fill="#33000000" />
+								<Grid IsVisible="{Binding IsSelected}">
+									<Ellipse Fill="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" Stroke="White" StrokeThickness="2" />
+									<Path Data="M7,12.5 L10.5,16 L17,9" Stroke="{AppThemeBinding Light=White, Dark={StaticResource PrimaryDarkText}}" StrokeThickness="2.25"
+										StrokeLineCap="Round" StrokeLineJoin="Round" Aspect="None" />
+								</Grid>
+							</Grid>
 						</Grid>
 					</DataTemplate>
 				</CollectionView.ItemTemplate>

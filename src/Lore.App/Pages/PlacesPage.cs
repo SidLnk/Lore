@@ -14,7 +14,9 @@ public sealed class PlacesPage : ContentPage
 
 	readonly Session _session;
 	readonly LibraryViewModel _library;
-	readonly Picker _size = new() { Title = "Group by", ItemsSource = Sizes.Select(s => s.Label).ToList(), SelectedIndex = 0 };
+	// Same chip control as the Library filters; exactly one is active.
+	readonly HorizontalStackLayout _sizes = new() { Spacing = 8 };
+	int _sizeIndex;
 	readonly Label _summary = new() { Opacity = 0.7 };
 	readonly PlotDrawable _plot = new();
 	readonly GraphicsView _canvas;
@@ -45,14 +47,18 @@ public sealed class PlacesPage : ContentPage
 			_list.SelectedItem = null;
 			await OpenAsync(row.Place);
 		};
-		_size.SelectedIndexChanged += async (_, _) => await LoadAsync();
+		for (var i = 0; i < Sizes.Length; i++)
+		{
+			var index = i;
+			_sizes.Add(new Chip { Text = Sizes[i].Label, IsActive = i == 0, Command = new Command(async () => await SelectSizeAsync(index)) });
+		}
 
 		Content = new Grid
 		{
 			Padding = new Thickness(12, 4),
 			RowSpacing = 6,
 			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
-			Children = { _size, _summary.Row(1), _canvas.Row(2), _list.Row(3) },
+			Children = { _sizes, _summary.Row(1), _canvas.Row(2), _list.Row(3) },
 		};
 	}
 
@@ -67,7 +73,7 @@ public sealed class PlacesPage : ContentPage
 		if (_session.Api is not { } api) return;
 		try
 		{
-			_places = await api.GetPlacesAsync(Sizes[Math.Max(0, _size.SelectedIndex)].Cell);
+			_places = await api.GetPlacesAsync(Sizes[_sizeIndex].Cell);
 			_summary.Text = _places.Count == 0 ? "" : $"{Format.Plural(_places.Sum(p => p.Count), "item")} in {Format.Plural(_places.Count, "place")}";
 			_plot.Places = _places;
 			_canvas.Invalidate();
@@ -77,6 +83,14 @@ public sealed class PlacesPage : ContentPage
 		{
 			_summary.Text = "Can't reach Lore. Connect to home Wi-Fi.";
 		}
+	}
+
+	async Task SelectSizeAsync(int index)
+	{
+		if (index == _sizeIndex) return;
+		_sizeIndex = index;
+		for (var i = 0; i < _sizes.Count; i++) ((Chip)_sizes[i]).IsActive = i == index;
+		await LoadAsync();
 	}
 
 	async Task OpenAsync(PlaceDto place)
@@ -93,7 +107,7 @@ public sealed class PlacesPage : ContentPage
 		title.SetBinding(Label.TextProperty, static (PlaceRow r) => r.Title);
 		var detail = new Label { FontSize = 13, Opacity = 0.7 };
 		detail.SetBinding(Label.TextProperty, static (PlaceRow r) => r.Detail);
-		var maps = new Button { Text = "Maps", Style = (Style)Application.Current!.Resources["SecondaryButton"], VerticalOptions = LayoutOptions.Center };
+		var maps = new Button { Text = "Maps", Style = (Style)Application.Current!.Resources["TextButton"], VerticalOptions = LayoutOptions.Center };
 		maps.SetBinding(Button.CommandParameterProperty, static (PlaceRow r) => r.Place);
 		// Hands off to the phone's maps app (uses the internet there; Lore itself stays offline).
 		maps.Clicked += async (s, _) =>
@@ -122,7 +136,7 @@ public sealed class PlacesPage : ContentPage
 		public string Detail => $"{Format.Plural(Place.Count, "item")} · {Range(Place.FirstTaken, Place.LastTaken)}";
 
 		// shortcut: coordinates instead of place names; naming needs reverse geocoding (online) or an offline gazetteer.
-		public static string Coordinates(PlaceDto p) => $"{Math.Abs(p.Lat):0.###}°{(p.Lat >= 0 ? "N" : "S")}, {Math.Abs(p.Lon):0.###}°{(p.Lon >= 0 ? "E" : "W")}";
+		public static string Coordinates(PlaceDto p) => Format.Coordinates(p.Lat, p.Lon);
 
 		static string Range(DateTime a, DateTime b) =>
 			a.Year == b.Year && a.Month == b.Month ? $"{a:MMM yyyy}" : $"{a:MMM yyyy} – {b:MMM yyyy}";

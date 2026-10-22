@@ -1,6 +1,8 @@
 using Lore.App.Services;
 using Lore.Client;
 using Lore.Contracts;
+using Microsoft.Maui.Controls.Shapes;
+using Path = Microsoft.Maui.Controls.Shapes.Path;
 
 namespace Lore.App.Pages;
 
@@ -33,7 +35,21 @@ public sealed class HomePage : ContentPage
 				var image = new Image { Aspect = Aspect.AspectFill, HeightRequest = DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density / 3 - 2 };
 				image.SetAppThemeColor(BackgroundColorProperty, Color.FromArgb("#E6E6E6"), Color.FromArgb("#2A2A2A"));
 				image.SetBinding(Image.SourceProperty, static (MediaItem m) => m.ThumbUrl);
-				return image;
+				var duration = new Label { TextColor = Colors.White, FontSize = 12, VerticalOptions = LayoutOptions.Center };
+				duration.SetBinding(Label.TextProperty, static (MediaItem m) => m.DurationText);
+				duration.SetBinding(IsVisibleProperty, static (MediaItem m) => m.HasDuration);
+				var video = new HorizontalStackLayout
+				{
+					Spacing = 4, Padding = new Thickness(6, 3), Margin = 4, BackgroundColor = Color.FromArgb("#80000000"),
+					HorizontalOptions = LayoutOptions.End, VerticalOptions = LayoutOptions.End,
+					Children =
+					{
+						new Path { Data = (Geometry)new PathGeometryConverter().ConvertFromInvariantString("M0,0 L7,4.5 L0,9 Z")!, Fill = Colors.White, WidthRequest = 7, HeightRequest = 9, VerticalOptions = LayoutOptions.Center },
+						duration,
+					},
+				};
+				video.SetBinding(IsVisibleProperty, static (MediaItem m) => m.IsVideo);
+				return new Grid { Children = { image, video } };
 			}),
 		};
 		_recent.SelectionChanged += async (_, e) =>
