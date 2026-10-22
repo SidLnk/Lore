@@ -7,8 +7,8 @@
 	x:DataType="pages:UploadViewModel"
 	Title="Upload">
 
-	<!-- Choose (who it belongs to, then what) / queue status / queue. One filled action on the screen. -->
-	<Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,8,16,0">
+	<!-- Choose (who it belongs to, then what) / free up space / queue status / queue. One filled action on the screen. -->
+	<Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="16,8,16,0">
 		<Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
 			<Label Text="Belongs to" VerticalOptions="Center" />
 			<Picker Grid.Column="1" ItemsSource="{Binding Owners}" SelectedItem="{Binding SelectedOwner}" Title="Owner" />
@@ -18,12 +18,19 @@
 			<Button Text="Use system picker" Style="{StaticResource TextButton}" HorizontalOptions="Start" Margin="-12,0,0,0"
 				Command="{Binding SystemPickerCommand}" />
 		</VerticalStackLayout>
-		<Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,16,-12,0">
+		<VerticalStackLayout Grid.Row="2" Spacing="0" Margin="0,16,0,0">
+			<Label Text="{Binding FreeUpText}" Style="{StaticResource Quiet}" />
+			<HorizontalStackLayout Margin="-12,0,0,0">
+				<Button Text="Free up space" Style="{StaticResource TextButton}" Command="{Binding FreeUpCommand}" IsVisible="{Binding CanFreeUp}" />
+				<Button Text="Check this phone" Style="{StaticResource TextButton}" Command="{Binding CheckPhoneCommand}" />
+			</HorizontalStackLayout>
+		</VerticalStackLayout>
+		<Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto" Margin="0,8,-12,0">
 			<Label Text="{Binding Summary}" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
 			<Button Grid.Column="1" Text="Retry failed" Style="{StaticResource TextButton}" Command="{Binding RetryFailedCommand}" IsVisible="{Binding HasFailed}" />
 			<Button Grid.Column="2" Text="Clear done" Style="{StaticResource TextButton}" Command="{Binding ClearDoneCommand}" />
 		</Grid>
-		<CollectionView x:Name="Queue" Grid.Row="3" ItemsSource="{Binding Rows}">
+		<CollectionView x:Name="Queue" Grid.Row="4" ItemsSource="{Binding Rows}">
 			<CollectionView.ItemTemplate>
 				<DataTemplate x:DataType="pages:QueueRow">
 					<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="6" Padding="0,10">

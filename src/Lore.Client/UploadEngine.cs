@@ -38,6 +38,9 @@ public sealed class UploadEngine(
                 item.Status = UploadStatus.Done;
                 item.Error = null;
                 await SaveAsync(item);
+                // Gallery files stay on the phone; remember they're safe in Lore (badge, Free up space).
+                if (item.FilePath.StartsWith("content://", StringComparison.Ordinal))
+                    await queue.MarkInLoreAsync(item.FilePath, item.Sha256!, item.Size);
                 _discard(item.FilePath);
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)

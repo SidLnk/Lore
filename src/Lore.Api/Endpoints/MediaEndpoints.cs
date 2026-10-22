@@ -108,6 +108,16 @@ public static class MediaEndpoints
             return Results.Ok(new EmptyBinResponse(rows.Count, rows.Sum(r => r.FileSize)));
         });
 
+        api.MapPost("/media/exists", async (ExistsRequest r, Db db) =>
+        {
+            if (r.Sha256s is not { Count: <= 1000 }) return Results.BadRequest("Send up to 1000 sha256 values");
+            var shas = r.Sha256s.Select(s => s.ToLowerInvariant()).Distinct().ToList();
+            using var c = db.Open();
+            var present = await c.QueryAsync<string>(
+                "SELECT Sha256 FROM MediaAsset WHERE Sha256 IN @shas AND DeletedAt IS NULL", new { shas });
+            return Results.Ok(new ExistsResponse(present.ToList()));
+        });
+
         api.MapGet("/stats/storage", async (Db db, StorageRegistry storage) =>
         {
             using var c = db.Open();

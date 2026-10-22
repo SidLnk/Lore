@@ -262,6 +262,15 @@ Soft and steady: solid, calm and easy to hit. Each screen gets **one** filled bu
 - On finish, a dismissable summary that stays: "Saved 3 items to Pictures/Lore or Movies/Lore · 2 already on this phone · 1 failed (try again on home Wi-Fi)". Only the parts that apply appear.
 - An exact copy already on the phone (same size, then same SHA-256) is never downloaded again.
 
+### In Lore and Free Up Space
+- **In Lore badge:** in the device-photo chooser, a phone file whose exact bytes are in Lore gets a bottom-left badge: a drawn check plus "In Lore" (12px, white, on the same 50% black as the video badge). It stays selectable.
+- **Upload tab:** a quiet line under the choose buttons, either "926 KB on this phone (18 items) is already safe in Lore." or a hint to run Check this phone. Below it are two text buttons: **Free up space** (only when there's something to free) and **Check this phone**.
+- **Check this phone** fingerprints the whole gallery in the background service. It shows a "Checking this phone · 120 of 3,400" notification, then a summary: "Checked 20 photos and videos on this phone: 19 are safe in Lore."
+- **Free up space** is for home Wi-Fi only. It re-fingerprints every file and asks Lore to confirm it still holds that exact file outside the recycle bin. Edited files are skipped and forgotten.
+  - **Android 11+:** files move to the phone's trash through the system dialog ("Allow Lore to move 18 items to trash?").
+  - **Older Android:** Lore asks first, and the copies are deleted for good.
+  - **Result toast:** "Moved 18 items (926 KB) to the phone's trash. Android empties it after 30 days; Lore keeps the originals."
+
 ### Queue Row
 - **Line 1:** the filename (middle-truncated), with a short status on the right in Quiet style ("Uploaded", "Already in Lore", "62% · 3.4 MB", "Retry 2/5").
 - **Line 2:** a full-width Archive Green progress bar.

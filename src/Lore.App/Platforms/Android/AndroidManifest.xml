@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<application android:allowBackup="false" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"
-		android:networkSecurityConfig="@xml/network_security_config"></application>
+		android:networkSecurityConfig="@xml/network_security_config"
+		android:requestLegacyExternalStorage="true"></application>
+	<!-- requestLegacyExternalStorage: Android 10 only (ignored on 11+), so Free up space can delete gallery files there. -->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -15,6 +17,6 @@
 	<uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 	<uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-	<!-- Save to phone on Android 8-9; newer versions add to the gallery without a permission. -->
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+	<!-- Save to phone on Android 8-9 and Free up space on 8-10; Android 11+ uses system trash/insert requests instead. -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 </manifest>

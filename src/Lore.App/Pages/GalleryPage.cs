@@ -7,9 +7,11 @@ using Lore.App.Services;
 
 namespace Lore.App.Pages;
 
-public sealed partial class GalleryItem(DeviceMedia media) : ObservableObject
+public sealed partial class GalleryItem(DeviceMedia media, bool inLore) : ObservableObject
 {
 	public DeviceMedia Media { get; } = media;
+	/// <summary>This exact file is already in Lore (uploaded, or found by Check this phone).</summary>
+	public bool InLore { get; } = inLore;
 	public bool IsVideo => Media.IsVideo;
 	// Loaded lazily when the tile is first drawn.
 	public ImageSource Thumb { get; } = ImageSource.FromStream(() => DeviceGallery.Thumbnail(media, 256) is { } jpeg ? new MemoryStream(jpeg) : Stream.Null);
@@ -28,6 +30,7 @@ public sealed class GalleryPage : ContentPage
 	readonly Label _message = new() { Padding = 16, IsVisible = false };
 	readonly Button _settings = new() { Text = "Open settings", IsVisible = false, Margin = new Thickness(16, 0) };
 	bool _end, _loading;
+	Dictionary<string, long> _inLore = [];
 
 	public GalleryPage(UploadViewModel upload, Uploads uploads)
 	{
@@ -74,7 +77,24 @@ public sealed class GalleryPage : ContentPage
 					WidthRequest = 24, HeightRequest = 24, Margin = 6, HorizontalOptions = LayoutOptions.Start, VerticalOptions = LayoutOptions.Start,
 					Children = { new Ellipse { Stroke = Colors.White, StrokeThickness = 2, Fill = Color.FromArgb("#33000000") }, check },
 				};
-				var tile = new SquareGrid { Children = { image, video, mark } };
+				// "In Lore": same badge language as video (50% black, drawn glyph, 12px label), bottom left.
+				var inLore = new HorizontalStackLayout
+				{
+					Spacing = 3, Padding = new Thickness(5, 2, 6, 2), Margin = 4, BackgroundColor = Color.FromArgb("#80000000"),
+					HorizontalOptions = LayoutOptions.Start, VerticalOptions = LayoutOptions.End,
+					Children =
+					{
+						new Path
+						{
+							Data = (Geometry)new PathGeometryConverter().ConvertFromInvariantString("M1,5 L4,8 L10,1")!,
+							Stroke = Colors.White, StrokeThickness = 1.75, StrokeLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round,
+							WidthRequest = 11, HeightRequest = 9, VerticalOptions = LayoutOptions.Center, Aspect = Stretch.None,
+						},
+						new Label { Text = "In Lore", TextColor = Colors.White, FontSize = 12, VerticalOptions = LayoutOptions.Center },
+					},
+				};
+				inLore.SetBinding(IsVisibleProperty, static (GalleryItem i) => i.InLore);
+				var tile = new SquareGrid { Children = { image, video, inLore, mark } };
 				tile.SetBinding(BackgroundColorProperty, static (GalleryItem i) => i.IsSelected, converter: new SelectedTile());
 				var tap = new TapGestureRecognizer();
 				tap.Tapped += (s, _) =>
@@ -109,6 +129,7 @@ public sealed class GalleryPage : ContentPage
 			return;
 		}
 		_message.IsVisible = _settings.IsVisible = false;
+		_inLore = (await _uploads.Queue.InLoreAsync()).ToDictionary(r => r.ContentUri, r => r.Size);
 		LoadMore();
 	}
 
@@ -117,7 +138,8 @@ public sealed class GalleryPage : ContentPage
 		if (_loading || _end) return;
 		_loading = true;
 		var page = DeviceGallery.Query(_items.Count, PageSize);
-		foreach (var m in page) _items.Add(new GalleryItem(m));
+		foreach (var m in page)
+			_items.Add(new GalleryItem(m, _inLore.TryGetValue(m.ContentUri.ToString()!, out var size) && size == m.Size));
 		_end = page.Count < PageSize;
 		_loading = false;
 	}

@@ -127,6 +127,27 @@ public sealed class UploadEngineTests : IDisposable
         Assert.Equal(items[0].MediaId, items[1].MediaId);
     }
 
+    [Fact]
+    public async Task Gallery_uploads_are_remembered_as_in_lore_after_clear_done()
+    {
+        var api = await _f.PairAsync();
+        var jpeg = Fixtures.Jpeg(43, DateTime.Now);
+        var other = Fixtures.Jpeg(44, DateTime.Now);
+        var queue = NewQueue();
+        const string uri = "content://media/external/images/media/7";
+        await queue.AddAsync(new QueueItem { FilePath = uri, FileName = "IMG_7.jpg", MimeType = "image/jpeg", Size = jpeg.Length, OwnerId = 1 });
+        await EnqueueAsync(queue, "copy.jpg", other, "image/jpeg", 1); // app-private copy: not a gallery file
+
+        // The gallery item is read through openRead (as Android does for content URIs) and never discarded.
+        await new UploadEngine(api, queue, Online, NoWait,
+            openRead: p => p == uri ? new MemoryStream(jpeg) : File.OpenRead(p),
+            discard: p => { if (p != uri) File.Delete(p); }).RunAsync(CancellationToken.None);
+        await queue.ClearDoneAsync();
+
+        var inLore = Assert.Single(await queue.InLoreAsync());
+        Assert.Equal((uri, Fixtures.Sha256(jpeg), (long)jpeg.Length), (inLore.ContentUri, inLore.Sha256, inLore.Size));
+    }
+
     static async Task<List<MediaDto>> PageAllAsync(LoreApiClient api, MediaQuery q, int pageSize = 60)
     {
         var all = new List<MediaDto>();

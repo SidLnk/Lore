@@ -4,6 +4,18 @@ namespace Lore.Client;
 
 public enum UploadStatus { Pending, Uploading, Done, Failed }
 
+/// <summary>
+/// A phone gallery file whose exact bytes (Sha256) Lore holds, as of RecordedAt. Kept apart from the queue,
+/// so "Clear done" doesn't forget it. It's a hint, not proof: Free up space re-hashes and re-asks the server first.
+/// </summary>
+public sealed class InLoreItem
+{
+    [PrimaryKey] public string ContentUri { get; set; } = "";
+    public string Sha256 { get; set; } = "";
+    public long Size { get; set; }
+    public DateTime RecordedAt { get; set; }
+}
+
 /// <summary>One file waiting to go to the server. Persisted so the queue survives app restarts.</summary>
 public sealed class QueueItem
 {
@@ -34,8 +46,23 @@ public sealed class UploadQueue
     public UploadQueue(string dbPath)
     {
         _db = new SQLiteAsyncConnection(dbPath);
-        _db.GetConnection().CreateTable<QueueItem>();
+        var c = _db.GetConnection();
+        c.CreateTable<QueueItem>();
+        c.CreateTable<InLoreItem>();
+        // Backfill from finished gallery uploads that predate the InLoreItem table.
+        c.Execute("""
+            INSERT OR IGNORE INTO InLoreItem(ContentUri, Sha256, Size, RecordedAt)
+            SELECT FilePath, Sha256, Size, QueuedAt FROM QueueItem
+            WHERE Status = ? AND Sha256 IS NOT NULL AND FilePath LIKE 'content://%'
+            """, (int)UploadStatus.Done);
     }
+
+    public Task MarkInLoreAsync(string contentUri, string sha256, long size) =>
+        _db.InsertOrReplaceAsync(new InLoreItem { ContentUri = contentUri, Sha256 = sha256, Size = size, RecordedAt = DateTime.UtcNow });
+
+    public Task<List<InLoreItem>> InLoreAsync() => _db.Table<InLoreItem>().ToListAsync();
+
+    public Task ForgetInLoreAsync(string contentUri) => _db.DeleteAsync<InLoreItem>(contentUri);
 
     public Task AddAsync(QueueItem item)
     {

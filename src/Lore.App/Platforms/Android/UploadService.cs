@@ -19,7 +19,7 @@ public sealed class UploadService : Service
 {
 	const string Channel = "uploads";
 	const int NotificationId = 1, SummaryId = 2;
-	const string UploadTitle = "Uploading to Lore", SaveTitle = "Saving to phone";
+	const string UploadTitle = "Uploading to Lore", SaveTitle = "Saving to phone", CheckTitle = "Checking this phone";
 
 	static int _running;
 	CancellationTokenSource? _cts;
@@ -59,6 +59,7 @@ public sealed class UploadService : Service
 			var services = IPlatformApplication.Current!.Services;
 			var uploads = services.GetRequiredService<Uploads>();
 			var saves = services.GetRequiredService<Saves>();
+			var freeUp = services.GetRequiredService<FreeUp>();
 			var engine = uploads.CreateEngine();
 			engine.ItemChanged += Notify;
 			do
@@ -71,8 +72,11 @@ public sealed class UploadService : Service
 				var summary = await saves.DrainAsync((name, done, total) => Update(name == null
 					? Build(SaveTitle, "Waiting for home Wi-Fi…", 0, 0)
 					: Build(SaveTitle, $"{name} · {done + 1} of {total}", total, done)), ct);
-				if (!string.IsNullOrEmpty(summary)) ShowSummary(summary);
-			} while (!ct.IsCancellationRequested && (await uploads.Queue.NextAsync() != null || saves.HasWork));
+				if (!string.IsNullOrEmpty(summary)) ShowSummary(SaveTitle, summary);
+				var checkedPhone = await freeUp.CheckPhoneAsync((done, total) =>
+					Update(Build(CheckTitle, $"{done + 1:N0} of {total:N0}", total, done)), ct);
+				if (checkedPhone != null) ShowSummary(CheckTitle, checkedPhone);
+			} while (!ct.IsCancellationRequested && (await uploads.Queue.NextAsync() != null || saves.HasWork || freeUp.HasWork));
 		}
 		catch (System.OperationCanceledException) { }
 		catch (Exception e)
@@ -114,9 +118,9 @@ public sealed class UploadService : Service
 	void Update(Notification n) => NotificationManagerCompat.From(this)!.Notify(NotificationId, n);
 
 	/// <summary>Stays after the service stops, so the family can see what a save did.</summary>
-	void ShowSummary(string text) => NotificationManagerCompat.From(this)!.Notify(SummaryId,
+	void ShowSummary(string title, string text) => NotificationManagerCompat.From(this)!.Notify(SummaryId,
 		new NotificationCompat.Builder(this, Channel)
-			.SetContentTitle(SaveTitle)!
+			.SetContentTitle(title)!
 			.SetContentText(text)!
 			.SetStyle(new NotificationCompat.BigTextStyle().BigText(text))!
 			.SetSmallIcon(Resource.Mipmap.appicon)!

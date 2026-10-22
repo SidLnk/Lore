@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lore.App.Services;
@@ -39,12 +41,14 @@ public sealed partial class UploadViewModel : ObservableObject
 {
 	readonly Session _session;
 	readonly Uploads _uploads;
+	readonly FreeUp _freeUp;
 	readonly Dictionary<int, QueueRow> _rows = [];
 
-	public UploadViewModel(Session session, Uploads uploads)
+	public UploadViewModel(Session session, Uploads uploads, FreeUp freeUp)
 	{
 		_session = session;
 		_uploads = uploads;
+		_freeUp = freeUp;
 		Owners = session.Family.Select(f => new OwnerOption(f.Id, f.Name)).ToList();
 		SelectedOwner = Owners.FirstOrDefault(o => o.Id == session.DefaultOwnerId) ?? Owners.FirstOrDefault();
 	}
@@ -55,6 +59,76 @@ public sealed partial class UploadViewModel : ObservableObject
 	[ObservableProperty] public partial OwnerOption? SelectedOwner { get; set; }
 	[ObservableProperty] public partial string Summary { get; set; } = "";
 	[ObservableProperty] public partial bool HasFailed { get; set; }
+	[ObservableProperty] public partial string FreeUpText { get; set; } = "";
+	[ObservableProperty] public partial bool CanFreeUp { get; set; }
+	[ObservableProperty] public partial bool IsFreeingUp { get; set; }
+
+	/// <summary>How much of this phone's gallery is already safe in Lore. Queries MediaStore, so not on every poll.</summary>
+	public async Task RefreshFreeUpAsync()
+	{
+		if (IsFreeingUp) return;
+		var candidates = await _freeUp.CandidatesAsync();
+		CanFreeUp = candidates.Count > 0;
+		FreeUpText = CanFreeUp
+			? $"{Format.Bytes(candidates.Sum(c => c.Size))} on this phone ({Format.Plural(candidates.Count, "item")}) is already safe in Lore."
+			: "Photos you upload from this phone are marked In Lore. Check this phone to find ones uploaded earlier or from another phone.";
+	}
+
+	[RelayCommand]
+	async Task FreeUpAsync()
+	{
+#if ANDROID
+		if (!Uploads.OnLan)
+		{
+			await Shell.Current.DisplayAlertAsync("Free up space", "Connect to home Wi-Fi first, so Lore can confirm it has every file.", "OK");
+			return;
+		}
+		var candidates = await _freeUp.CandidatesAsync();
+		if (candidates.Count == 0) return;
+		var trash = OperatingSystem.IsAndroidVersionAtLeast(30);
+		// Android 11+ asks itself (and keeps them in the trash for 30 days); older Android deletes, so ask first.
+		if (!trash && !await Shell.Current.DisplayAlertAsync("Free up space?",
+			$"Delete {Format.Plural(candidates.Count, "photo and video")} ({Format.Bytes(candidates.Sum(c => c.Size))}) from this phone? " +
+			"Lore keeps the originals on the home PC. This can't be undone on the phone.", "Delete", "Cancel")) return;
+
+		IsFreeingUp = true;
+		try
+		{
+			var result = await _freeUp.FreeAsync(candidates, (done, total) =>
+				MainThread.BeginInvokeOnMainThread(() => FreeUpText = $"Checking each file against Lore… {done + 1:N0} of {total:N0}"), CancellationToken.None);
+			var message = result switch
+			{
+				null => "Nothing was removed.",
+				(0, _) => "Nothing to free: those files changed on the phone or aren't in Lore any more.",
+				var (n, bytes) when trash => $"Moved {Format.Plural(n, "item")} ({Format.Bytes(bytes)}) to the phone's trash. Android empties it after 30 days; Lore keeps the originals.",
+				var (n, bytes) => $"Deleted {Format.Plural(n, "item")} ({Format.Bytes(bytes)}) from this phone. Lore keeps the originals.",
+			};
+			await Toast.Make(message, ToastDuration.Long).Show();
+		}
+		catch (Exception e) when (e is HttpRequestException or TaskCanceledException or LoreApiException)
+		{
+			await Shell.Current.DisplayAlertAsync("Free up space", "Couldn't reach Lore, so nothing was removed. Are you on home Wi-Fi?", "OK");
+		}
+		finally
+		{
+			IsFreeingUp = false;
+			await RefreshFreeUpAsync();
+		}
+#else
+		await Task.CompletedTask;
+#endif
+	}
+
+	[RelayCommand]
+	async Task CheckPhoneAsync()
+	{
+#if ANDROID
+		await _freeUp.RequestCheckAsync();
+		await Toast.Make("Checking this phone in the background. A notification says when it's done.", ToastDuration.Long).Show();
+#else
+		await Task.CompletedTask;
+#endif
+	}
 
 	/// <summary>Raised when new queue rows appear at the top, so the page can scroll to them.</summary>
 	public event Action? RowsAddedAtTop;

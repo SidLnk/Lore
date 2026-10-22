@@ -32,8 +32,8 @@ public static class DeviceGallery
 			.. OperatingSystem.IsAndroidVersionAtLeast(33)
 				? new[] { (Manifest.Permission.ReadMediaImages, true), (Manifest.Permission.ReadMediaVideo, true) }
 				: [(Manifest.Permission.ReadExternalStorage, true)],
-			// Android 8-9 only: Save to phone writes into the shared Pictures/Movies folders.
-			.. OperatingSystem.IsAndroidVersionAtLeast(29) ? Array.Empty<(string, bool)>() : [(Manifest.Permission.WriteExternalStorage, true)],
+			// Android 8-10: Save to phone (8-9) and Free up space (8-10) write to shared storage directly.
+			.. OperatingSystem.IsAndroidVersionAtLeast(30) ? Array.Empty<(string, bool)>() : [(Manifest.Permission.WriteExternalStorage, true)],
 			.. OperatingSystem.IsAndroidVersionAtLeast(29) ? [(Manifest.Permission.AccessMediaLocation, true)] : Array.Empty<(string, bool)>(),
 		];
 	}
@@ -66,6 +66,59 @@ public static class DeviceGallery
 		return result;
 	}
 
+	/// <summary>Current size of a gallery file, or null when it's gone (deleted, or in the phone's trash).</summary>
+	public static long? CurrentSize(string contentUri)
+	{
+		// A query by item URI still returns trashed rows, so ask for is_trashed and treat those as gone.
+		var trashColumn = OperatingSystem.IsAndroidVersionAtLeast(30);
+		using var c = Resolver.Query(Uri.Parse(contentUri)!,
+			trashColumn ? [MediaStore.IMediaColumns.Size, MediaStore.IMediaColumns.IsTrashed] : [MediaStore.IMediaColumns.Size], null, null, null);
+		if (c == null || !c.MoveToFirst() || trashColumn && c.GetInt(1) == 1) return null;
+		return c.GetLong(0);
+	}
+
+	/// <summary>SHA-256 (lower-case hex) of a gallery file's original bytes, or null if it can't be read.</summary>
+	public static string? Hash(string contentUri)
+	{
+		try
+		{
+			using var s = OpenOriginal(contentUri);
+			return Convert.ToHexStringLower(SHA256.HashData(s));
+		}
+		catch (Exception e) when (e is IOException or Java.Lang.Exception)
+		{
+			return null;
+		}
+	}
+
+	const int TrashRequest = 4201;
+	static TaskCompletionSource<bool>? _trash;
+
+	/// <summary>
+	/// Removes gallery files after the system asks the user. Android 11+: into the phone's trash (restorable for
+	/// 30 days). Android 8-10: deleted for good (the caller confirms first).
+	/// </summary>
+	/// <returns>False when the user said no.</returns>
+	public static async Task<bool> RemoveAsync(IReadOnlyList<string> contentUris)
+	{
+		if (contentUris.Count == 0) return true;
+		if (OperatingSystem.IsAndroidVersionAtLeast(30))
+		{
+			var request = MediaStore.CreateTrashRequest(Resolver, [.. contentUris.Select(u => Uri.Parse(u)!)], true);
+			_trash = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+			Platform.CurrentActivity!.StartIntentSenderForResult(request.IntentSender, TrashRequest, null, 0, 0, 0);
+			return await _trash.Task;
+		}
+		foreach (var u in contentUris) Resolver.Delete(Uri.Parse(u)!, null, null);
+		return true;
+	}
+
+	/// <summary>Called from MainActivity.OnActivityResult.</summary>
+	public static void OnActivityResult(int requestCode, Android.App.Result result)
+	{
+		if (requestCode == TrashRequest) _trash?.TrySetResult(result == Android.App.Result.Ok);
+	}
+
 	/// <summary>
 	/// Content URI of a gallery photo or video with exactly these bytes, or null.
 	/// Size narrows the candidates (usually to none); SHA-256 confirms.
@@ -82,15 +135,8 @@ public static class DeviceGallery
 		{
 			var collection = c.GetInt(1) == 3 ? MediaStore.Video.Media.ExternalContentUri! : MediaStore.Images.Media.ExternalContentUri!;
 			var uri = ContentUris.WithAppendedId(collection, c.GetLong(0)).ToString()!;
-			try
-			{
-				using var s = OpenOriginal(uri);
-				if (Convert.ToHexString(SHA256.HashData(s)).Equals(sha256, StringComparison.OrdinalIgnoreCase)) return uri;
-			}
-			catch (Exception e) when (e is IOException or Java.Lang.Exception)
-			{
-				// Unreadable (gone, or another app's file without permission): not a match.
-			}
+			// Hash is null when unreadable (gone, or another app's file without permission): not a match.
+			if (Hash(uri) is { } h && h.Equals(sha256, StringComparison.OrdinalIgnoreCase)) return uri;
 		}
 		return null;
 	}

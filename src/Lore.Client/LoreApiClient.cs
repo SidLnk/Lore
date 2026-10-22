@@ -74,6 +74,9 @@ public sealed class LoreApiClient(HttpClient http)
         return SendAsync<MediaPage>(HttpMethod.Get, "api/media?" + string.Join('&', qs), null, ct);
     }
 
+    public Task<ExistsResponse> ExistsAsync(IReadOnlyList<string> sha256s, CancellationToken ct = default) =>
+        SendAsync<ExistsResponse>(HttpMethod.Post, "api/media/exists", JsonContent.Create(new ExistsRequest(sha256s)), ct);
+
     public Task SetFavoriteAsync(Guid id, bool favorite, CancellationToken ct = default) =>
         SendAsync<object>(HttpMethod.Put, $"api/media/{id}/favorite", JsonContent.Create(new SetFavoriteRequest(favorite)), ct);
 

@@ -168,6 +168,26 @@ public sealed class ApiTests : IDisposable
     }
 
     [Fact]
+    public async Task Exists_reports_only_media_outside_the_bin()
+    {
+        var api = await _f.PairAsync();
+        var kept = Fixtures.Jpeg(41, new DateTime(2024, 1, 1));
+        var binned = Fixtures.Jpeg(42, new DateTime(2024, 1, 2));
+        Guid binnedId = default;
+        foreach (var (jpeg, name) in new[] { (kept, "a.jpg"), (binned, "b.jpg") })
+        {
+            var up = await api.CreateUploadAsync(new(Fixtures.Sha256(jpeg), jpeg.Length, name, "image/jpeg", 1, null));
+            await api.PutChunkAsync(up.UploadId!.Value, 0, jpeg);
+            binnedId = (await api.CompleteUploadAsync(up.UploadId!.Value)).MediaId;
+        }
+        await api.DeleteAsync(binnedId);
+
+        var unknown = new string('a', 64);
+        var r = await api.ExistsAsync([Fixtures.Sha256(kept).ToUpperInvariant(), Fixtures.Sha256(binned), unknown]);
+        Assert.Equal([Fixtures.Sha256(kept)], r.Present);
+    }
+
+    [Fact]
     public async Task Bad_query_values_are_rejected()
     {
         var api = await _f.PairAsync();

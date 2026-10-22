@@ -48,6 +48,10 @@ public record MediaDto(
 public record MediaPage(IReadOnlyList<MediaDto> Items, string? NextCursor);
 
 public record SetFavoriteRequest(bool Favorite);
+
+/// <summary>Which of these SHA-256s Lore holds outside the recycle bin (lets a phone free space safely).</summary>
+public record ExistsRequest(IReadOnlyList<string> Sha256s);
+public record ExistsResponse(IReadOnlyList<string> Present);
 public record EmptyBinResponse(int Removed, long Bytes);
 
 /// <summary>Library totals exclude the recycle bin; Bin* fields cover it.</summary>

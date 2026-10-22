@@ -21,6 +21,7 @@ public partial class UploadPage : ContentPage
 		_visible = true;
 		_vm.RowsAddedAtTop += ScrollToTop;
 		_ = _vm.RefreshAsync();
+		_ = _vm.RefreshFreeUpAsync();
 		// The queue is written by the background service; poll it while the page is on screen.
 		Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
 		{
