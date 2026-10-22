@@ -13,7 +13,7 @@ A private family photo and video library that lives on your own PC. Phones on th
 
 ## Download
 
-Get the Android app (Android 8.0+) from [Releases](https://github.com/SidLnk/Lore/releases/latest): open `lore-1.0.apk` on the phone and allow **Install unknown apps**. The app needs a Lore server on your network; set one up below, then [pair the phone](#pair-a-phone).
+Get the Android app (Android 8.0+) from [Releases](https://github.com/SidLnk/Lore/releases/latest): open the `lore-*.apk` file on the phone and allow **Install unknown apps**. The app needs a Lore server on your network; set one up below, then [pair the phone](#pair-a-phone).
 
 ## How it fits together
 
