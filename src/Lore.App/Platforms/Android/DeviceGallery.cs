@@ -12,8 +12,11 @@ using Path = System.IO.Path;
 
 namespace Lore.App.Droid;
 
-public sealed record DeviceMedia(long Id, string Name, string MimeType, long Size, DateTime? Taken, bool IsVideo)
+public sealed record DeviceMedia(long Id, string Name, string MimeType, long Size, DateTime? Taken, bool IsVideo, DateTime Added)
 {
+	/// <summary>When it was taken, or when it arrived on the phone if the file has no date (screenshots, downloads).</summary>
+	public DateTime When => Taken ?? Added;
+
 	public Uri ContentUri => ContentUris.WithAppendedId(IsVideo ? MediaStore.Video.Media.ExternalContentUri! : MediaStore.Images.Media.ExternalContentUri!, Id);
 }
 
@@ -40,18 +43,21 @@ public static class DeviceGallery
 
 	static ContentResolver Resolver => Platform.AppContext.ContentResolver!;
 
-	/// <summary>Newest first, by date added.</summary>
-	public static List<DeviceMedia> Query(int offset, int limit)
+	/// <summary>Newest first by date taken (date added when there is none). videos: null = both, true/false = only those.</summary>
+	public static List<DeviceMedia> Query(int offset, int limit, bool? videos = null)
 	{
 		string[] projection =
 		[
 			IBaseColumns.Id, MediaStore.IMediaColumns.DisplayName, MediaStore.IMediaColumns.MimeType,
 			MediaStore.IMediaColumns.Size, "datetaken" /* column predates the API 29 constant */, MediaStore.Files.IFileColumns.MediaType,
+			MediaStore.IMediaColumns.DateAdded,
 		];
 		var args = new Bundle();
-		args.PutString(ContentResolver.QueryArgSqlSelection, $"{MediaStore.Files.IFileColumns.MediaType} IN (1, 3)"); // image, video
-		// MediaProvider ignores QueryArgSortColumns; the SQL sort order is honoured.
-		args.PutString(ContentResolver.QueryArgSqlSortOrder, $"{MediaStore.IMediaColumns.DateAdded} DESC, {IBaseColumns.Id} DESC");
+		var types = videos switch { true => "3", false => "1", null => "1, 3" }; // 1 image, 3 video
+		args.PutString(ContentResolver.QueryArgSqlSelection, $"{MediaStore.Files.IFileColumns.MediaType} IN ({types})");
+		// MediaProvider ignores QueryArgSortColumns; the SQL sort order is honoured. Taken order keeps month groups whole.
+		args.PutString(ContentResolver.QueryArgSqlSortOrder,
+			$"COALESCE(datetaken, {MediaStore.IMediaColumns.DateAdded} * 1000) DESC, {IBaseColumns.Id} DESC");
 		args.PutInt(ContentResolver.QueryArgLimit, limit);
 		args.PutInt(ContentResolver.QueryArgOffset, offset);
 
@@ -61,7 +67,8 @@ public static class DeviceGallery
 		while (c.MoveToNext())
 		{
 			var taken = c.IsNull(4) ? (DateTime?)null : DateTimeOffset.FromUnixTimeMilliseconds(c.GetLong(4)).LocalDateTime;
-			result.Add(new DeviceMedia(c.GetLong(0), c.GetString(1) ?? $"media_{c.GetLong(0)}", c.GetString(2) ?? "", c.GetLong(3), taken, c.GetInt(5) == 3));
+			var added = DateTimeOffset.FromUnixTimeSeconds(c.GetLong(6)).LocalDateTime;
+			result.Add(new DeviceMedia(c.GetLong(0), c.GetString(1) ?? $"media_{c.GetLong(0)}", c.GetString(2) ?? "", c.GetLong(3), taken, c.GetInt(5) == 3, added));
 		}
 		return result;
 	}

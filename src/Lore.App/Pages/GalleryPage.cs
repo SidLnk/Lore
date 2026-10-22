@@ -18,13 +18,24 @@ public sealed partial class GalleryItem(DeviceMedia media, bool inLore) : Observ
 	[ObservableProperty] public partial bool IsSelected { get; set; }
 }
 
+public sealed class GalleryMonth(DateTime month) : ObservableCollection<GalleryItem>
+{
+	public DateTime Month { get; } = month;
+	public string Title => Month.ToString("MMMM yyyy");
+}
+
 /// <summary>Lore's own photo/video chooser, reading originals from MediaStore so location data is kept.</summary>
 public sealed class GalleryPage : ContentPage
 {
 	const int PageSize = 300;
 	readonly UploadViewModel _upload;
 	readonly Uploads _uploads;
-	readonly ObservableCollection<GalleryItem> _items = [];
+	static readonly (string Label, bool? Videos)[] Kinds = [("All", null), ("Photos", false), ("Videos", true)];
+	readonly ObservableCollection<GalleryMonth> _months = [];
+	// Picks survive switching between All, Photos and Videos.
+	readonly Dictionary<long, DeviceMedia> _picked = [];
+	readonly HorizontalStackLayout _kinds = new() { Spacing = 8, Padding = new Thickness(12, 4, 12, 0) };
+	int _loaded, _kind;
 	readonly CollectionView _grid;
 	readonly ToolbarItem _send = new() { Text = "Upload (0)" };
 	readonly Label _message = new() { Padding = 16, IsVisible = false };
@@ -45,7 +56,15 @@ public sealed class GalleryPage : ContentPage
 		{
 			ItemsLayout = new GridItemsLayout(4, ItemsLayoutOrientation.Vertical) { HorizontalItemSpacing = 2, VerticalItemSpacing = 2 },
 			RemainingItemsThreshold = 60,
-			ItemsSource = _items,
+			ItemsSource = _months,
+			IsGrouped = true,
+			// Month breaks, as in the Library, so a long camera roll is easy to scan.
+			GroupHeaderTemplate = new DataTemplate(() =>
+			{
+				var header = new Label { FontFamily = "OpenSansSemibold", FontSize = 16, Padding = new Thickness(8, 16, 8, 6) };
+				header.SetBinding(Label.TextProperty, static (GalleryMonth m) => m.Title);
+				return header;
+			}),
 			ItemTemplate = new DataTemplate(() =>
 			{
 				// Same selection language as the Library: inset photo on a tonal tile, drawn ring and check.
@@ -101,7 +120,9 @@ public sealed class GalleryPage : ContentPage
 				{
 					if (((View)s!).BindingContext is not GalleryItem item) return;
 					item.IsSelected = !item.IsSelected;
-					_send.Text = $"Upload ({_items.Count(i => i.IsSelected)})";
+					if (item.IsSelected) _picked[item.Media.Id] = item.Media;
+					else _picked.Remove(item.Media.Id);
+					_send.Text = $"Upload ({_picked.Count})";
 				};
 				tile.GestureRecognizers.Add(tap);
 				return tile;
@@ -110,17 +131,23 @@ public sealed class GalleryPage : ContentPage
 		_grid.RemainingItemsThresholdReached += (_, _) => LoadMore();
 		Adaptive.FitColumns(_grid, 4, 100);
 
+		for (var i = 0; i < Kinds.Length; i++)
+		{
+			var index = i;
+			_kinds.Add(new Chip { Text = Kinds[i].Label, IsActive = i == 0, Command = new Command(() => SelectKind(index)) });
+		}
+
 		Content = new Grid
 		{
-			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
-			Children = { _message, _settings.Row(1), _grid.Row(2) },
+			RowDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
+			Children = { _message, _settings.Row(1), _kinds.Row(2), _grid.Row(3) },
 		};
 	}
 
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
-		if (_items.Count > 0) return;
+		if (_loaded > 0) return;
 		if (await Permissions.RequestAsync<DeviceGallery.MediaPermission>() != PermissionStatus.Granted)
 		{
 			_message.Text = "Lore needs access to photos and videos to upload originals with their location. " +
@@ -137,16 +164,33 @@ public sealed class GalleryPage : ContentPage
 	{
 		if (_loading || _end) return;
 		_loading = true;
-		var page = DeviceGallery.Query(_items.Count, PageSize);
+		var page = DeviceGallery.Query(_loaded, PageSize, Kinds[_kind].Videos);
+		_loaded += page.Count;
 		foreach (var m in page)
-			_items.Add(new GalleryItem(m, _inLore.TryGetValue(m.ContentUri.ToString()!, out var size) && size == m.Size));
+		{
+			var month = new DateTime(m.When.Year, m.When.Month, 1);
+			if (_months.LastOrDefault() is not { } group || group.Month != month) _months.Add(group = new GalleryMonth(month));
+			group.Add(new GalleryItem(m, _inLore.TryGetValue(m.ContentUri.ToString()!, out var size) && size == m.Size)
+				{ IsSelected = _picked.ContainsKey(m.Id) });
+		}
 		_end = page.Count < PageSize;
 		_loading = false;
 	}
 
+	void SelectKind(int index)
+	{
+		if (index == _kind) return;
+		_kind = index;
+		for (var i = 0; i < _kinds.Count; i++) ((Chip)_kinds[i]).IsActive = i == index;
+		_months.Clear();
+		_loaded = 0;
+		_end = false;
+		LoadMore();
+	}
+
 	async Task SendAsync()
 	{
-		var picked = _items.Where(i => i.IsSelected).Select(i => i.Media).ToList();
+		var picked = _picked.Values.OrderBy(m => m.When).ToList();
 		if (picked.Count == 0 || _upload.SelectedOwner?.Id is not { } owner) return;
 		// Progress notification on Android 13+; uploads still run if the user says no.
 		await Permissions.RequestAsync<Permissions.PostNotifications>();
