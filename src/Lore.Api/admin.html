@@ -60,14 +60,16 @@
 const fmt = d => d ? new Date(d).toLocaleString() : '—';
 
 document.getElementById('new-code').onclick = async () => {
-  const r = await fetch('api/pairing-codes', { method: 'POST' });
+  // Absolute paths: relative ones resolved to /api/... when the page was opened as /admin (no trailing slash).
+  const r = await fetch('/admin/api/pairing-codes', { method: 'POST' });
+  if (!r.ok) { document.getElementById('expires').textContent = `Couldn't create a code (HTTP ${r.status}). Reload the page and try again.`; return; }
   const { code, expiresAt } = await r.json();
   document.getElementById('code').textContent = code;
   document.getElementById('expires').textContent = 'Expires ' + fmt(expiresAt);
 };
 
 async function loadDevices() {
-  const devices = await (await fetch('api/devices')).json();
+  const devices = await (await fetch('/admin/api/devices')).json();
   const body = document.getElementById('devices');
   body.replaceChildren(...devices.map(d => {
     const tr = document.createElement('tr');
@@ -79,7 +81,7 @@ async function loadDevices() {
     else {
       const b = document.createElement('button');
       b.textContent = 'Revoke';
-      b.onclick = async () => { await fetch(`api/devices/${d.id}/revoke`, { method: 'POST' }); loadDevices(); };
+      b.onclick = async () => { await fetch(`/admin/api/devices/${d.id}/revoke`, { method: 'POST' }); loadDevices(); };
       td.append(b);
     }
     tr.append(td);
@@ -95,7 +97,7 @@ const bytes = n => {
 };
 
 async function loadStatus() {
-  const s = await (await fetch('api/status')).json();
+  const s = await (await fetch('/admin/api/status')).json();
   const rows = [
     ['Photos & videos', `${s.mediaCount.toLocaleString()} (${bytes(s.mediaBytes)})`],
     ['Recycle bin', `${s.binCount.toLocaleString()} item(s)`],
