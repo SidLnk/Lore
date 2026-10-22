@@ -30,7 +30,8 @@ public partial class PairingPage : ContentPage
 			OwnerButtons.Clear();
 			foreach (var member in _session.Family)
 			{
-				var b = new Button { Text = member.Name };
+				// Equal choices, so none is the filled primary action.
+				var b = new Button { Text = member.Name, Style = (Style)Application.Current!.Resources["SecondaryButton"] };
 				b.Clicked += async (_, _) => await RunAsync(async () =>
 				{
 					await _session.SetDefaultOwnerAsync(member.Id);

@@ -19,8 +19,6 @@ public sealed class OrganizePage : ContentPage
 		_viewer = viewer;
 		Title = "Organize";
 		Adaptive.CapWidth(this);
-		ToolbarItems.Add(new ToolbarItem { Text = "New folder", Command = new Command(async () => await RunAsync(NewFolderAsync(null))) });
-		ToolbarItems.Add(new ToolbarItem { Text = "New album", Command = new Command(async () => await RunAsync(NewAlbumAsync())) });
 		Content = new ScrollView { Content = _list };
 	}
 
@@ -39,10 +37,11 @@ public sealed class OrganizePage : ContentPage
 		var tags = await Api.GetTagsAsync();
 
 		_list.Clear();
-		Heading("Folders", folders.Count == 0 ? "No folders yet. Folders only organize Lore; files on the PC never move." : null);
+		Heading("Folders", folders.Count == 0 ? "No folders yet. Folders only organize Lore; files on the PC never move." : null,
+			"New folder", () => NewFolderAsync(null));
 		foreach (var (folder, depth, path) in folders)
 			Row(folder.Name, folder.Count, depth, () => FolderActionsAsync(folder, path));
-		Heading("Albums", albums.Count == 0 ? "No albums yet." : null);
+		Heading("Albums", albums.Count == 0 ? "No albums yet." : null, "New album", NewAlbumAsync);
 		foreach (var album in albums)
 			Row(album.Name, album.Count, 0, () => AlbumActionsAsync(album));
 		Heading("Tags", tags.Count == 0 ? "No tags yet. Add them from Library → Select → Edit." : null);
@@ -50,9 +49,25 @@ public sealed class OrganizePage : ContentPage
 			Row(tag.Name, tag.Count, 0, () => ShowAsync(tag: tag.Name));
 	}
 
-	void Heading(string text, string? empty)
+	/// <summary>
+	/// A section heading, with its create action beside it rather than in the toolbar: two toolbar text
+	/// actions pushed the page title out at large text sizes.
+	/// </summary>
+	void Heading(string text, string? empty, string? action = null, Func<Task>? run = null)
 	{
-		_list.Add(new Label { Text = text, FontSize = 20, FontFamily = "OpenSansSemibold", Margin = new Thickness(0, 16, 0, 4) });
+		var heading = new Grid
+		{
+			ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)],
+			Margin = new Thickness(0, 16, 0, 4),
+			Children = { new Label { Text = text, FontSize = 20, FontFamily = "OpenSansSemibold", VerticalOptions = LayoutOptions.Center } },
+		};
+		if (action != null && run != null)
+		{
+			var button = new Button { Text = action, Style = (Style)Application.Current!.Resources["TextButton"], Margin = new Thickness(0, 0, -12, 0) };
+			button.Clicked += async (_, _) => await RunAsync(run());
+			heading.Add(button, 1);
+		}
+		_list.Add(heading);
 		if (empty != null) _list.Add(new Label { Text = empty, Opacity = 0.7 });
 	}
 

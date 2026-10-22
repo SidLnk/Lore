@@ -9,7 +9,12 @@
 		<VerticalStackLayout Padding="24" Spacing="16">
 			<Image Source="{AppThemeBinding Light=lore_logo.png, Dark=lore_logo_dark.png}" HeightRequest="40"
 				HorizontalOptions="Start" SemanticProperties.Description="Lore" />
-			<Label Text="On the home PC, open http://lore.home.arpa/admin and tap New pairing code. Enter it below." />
+			<!-- The address gets its own line: wrapped inside the sentence it broke mid-domain at large text sizes. -->
+			<VerticalStackLayout Spacing="2">
+				<Label Text="On the home PC, open" />
+				<Label Text="http://lore.home.arpa/admin" FontFamily="OpenSansSemibold" FontSize="16" />
+				<Label Text="and tap New pairing code. Enter the code below." />
+			</VerticalStackLayout>
 
 			<VerticalStackLayout x:Name="PairForm" Spacing="8">
 				<Label Text="Server" />
